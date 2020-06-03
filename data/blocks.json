@@ -1,0 +1,54 @@
+[
+	{
+		"name": "dirt",
+		"image": "dirt.png"
+	},
+	{
+		"name": "grass",
+		"image": "grass_block_side.png"
+	},
+	{
+		"name": "stone",
+		"image": "stone.png"
+	},
+	{
+		"name": "cobblestone",
+		"image": "cobblestone.png"
+	},
+	{
+		"name": "log",
+		"image": "oak_log.png"
+	},
+	{
+		"name": "leaves",
+		"image": "oak_leaves.png"
+	},
+	{
+		"name": "coal ore",
+		"image": "coal_ore.png"
+	},
+	{
+		"name": "iron ore",
+		"image": "iron_ore.png"
+	},
+	{
+		"name": "gold ore",
+		"image": "gold_ore.png"
+	},
+	{
+		"name": "redstone ore",
+		"image": "redstone_ore.png"
+	},
+	{
+		"name": "lapis ore",
+		"image": "lapis_ore.png"
+	},
+	{
+		"name": "emerald ore",
+		"image": "emerald_ore.png"
+	},
+	{
+		"name": "diamond ore",
+		"image": "diamond_ore.png"
+	}
+]
