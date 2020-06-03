@@ -1,22 +1,110 @@
+import { stringify } from "qs";
 
 const BLOCK_ID_NONE = 0;
 
-const DOCUMENT_ID = 'grid';
+const GRID_ID = 'grid';
 const SPACE_CLASS = 'space';
+
+const MAX_DIMENSION = 32;
+const DEF_DIMENSION = 8;
+const MIN_DIMENSION = 4;
 
 interface Block {
 	name: string,
 	image: string
 }
 
-/* all the blocks the client knows about */
-let blockData:Array<Block>;
+let debugGenerateData = (width:number, height:number, numBlocks:number) => {
+	
+}
 
-/* representation of the grid */
-let grid:Array<number>;
+let toHex = (int:number) => {
+	let str = int.toString(16);
+	if (str.length == 1)
+		str = '0' + str;
+
+	return str;
+}
+
+let fromHex = (data:string, position:number) => {
+	let str = data.substr(position * 2, position * 2 + 2);
+
+	return parseInt(str, 16);
+}
+
+class Painting {
+	width: number;
+	height: number;
+
+	data: number[];
+
+	toData() {
+		let data = '';
+
+		data += toHex(this.width);
+		data += toHex(this.height);
+
+		this.data.forEach(blockID => {
+			data += toHex(blockID);
+		});
+
+		return data;
+	}
+
+	fromData(data:string) {
+		/* do we have enough for a width and height */
+		if (data.length < 4) {
+			this.setDefault();
+			return;
+		}
+
+		this.width = fromHex(data, 0);
+		this.height = fromHex(data, 1);
+
+		/* is the painting too big or too small? */
+		if (
+			this.width < MIN_DIMENSION ||
+			this.height < MIN_DIMENSION ||
+			this.width > MAX_DIMENSION ||
+			this.height > MAX_DIMENSION 
+		) {
+			this.setDefault();
+			return;
+		}
+
+		/* is the amount of information correct for this width and height */
+		if (data.length !== (this.width * this.height + 2) * 2) {
+			this.setDefault();
+			return;
+		}
+
+		for (let i = 0; i < this.width * this.height; ++i) {
+			this.data.push(fromHex(data, i + 2));
+		}
+	}
+
+	/**
+	 * creates an empty painting representation at a default width and height
+	 * 
+	 * guaranteed to work
+	 */
+	setDefault() {
+		this.width = DEF_DIMENSION;
+		this.height = DEF_DIMENSION;
+
+		this.data = new Array(DEF_DIMENSION * DEF_DIMENSION).fill(BLOCK_ID_NONE);
+	}
+}
+
+/* all the blocks the client knows about */
+let blockNames:string[];
+
+/* representation of the current painting */
+let painting:Painting;
 
 let getGrid = () => {
-	return <HTMLDivElement>document.getElementById(DOCUMENT_ID);
+	console.log(<HTMLDivElement>document.getElementById(GRID_ID));
+	return <HTMLDivElement>document.getElementById(GRID_ID);
 }
 
 /**
@@ -45,14 +133,21 @@ let clearGrid = () => {
 let fillEmptyGrid = (width:number, height:number) => {
 	let gridElement = clearGrid();
 
+	gridElement.style.gridTemplateColumns = '50px '.repeat(width);
+	gridElement.style.gridTemplateRows = '50px '.repeat(height);
+
 	for (var j = 0; j < height; ++j) {
 		for (var i = 0; i < width; ++i) {
-
+			let gridSpace = document.createElement('div');
+			gridSpace.className = 'space';
+			gridElement.appendChild(gridSpace);
 		}
 	}
 
 	/* clear representation */
-	grid = new Array(width * height).fill(BLOCK_ID_NONE);
+	painting.width = width;
+	painting.height = height;
+	painting.data = new Array(width * height).fill(BLOCK_ID_NONE);
 }
 
 let getBlockURL = (imageName:string) => {
@@ -60,7 +155,11 @@ let getBlockURL = (imageName:string) => {
 }
 
 let parseData = (url:string) => {
-	//TODO parse data from url
+	if (url.startsWith('/blocks/')) {
+		let parts = url.split('/blocks/');
+		
+		let dataPart = parts[1];
+	}
 }
 
 let onStart = (url:string) => {
@@ -70,10 +169,12 @@ let onStart = (url:string) => {
 	request.send();
 
 	request.onreadystatechange = () => {
-		blockData = JSON.parse(request.responseText);
+		blockNames = JSON.parse(request.responseText);
 		
-		console.log(blockData);
+		console.log(blockNames);
 	}
+
+	fillEmptyGrid(6, 6);
 }
 
 /* what happens when we load the page */

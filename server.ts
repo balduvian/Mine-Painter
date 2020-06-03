@@ -6,6 +6,9 @@ import * as fs from 'fs';
 const port = process.env.PORT || 3000;
 let server = express();
 
+let blockNames:Array<string> = [];
+let blockImages:Array<string> = [];
+
 let activeButtons = (gallery:boolean, edit:boolean) => {
 	const CURRENT_TAG = 'current';
 
@@ -17,6 +20,22 @@ let activeButtons = (gallery:boolean, edit:boolean) => {
 
 let getEdit = (req, res, next) => {
 	res.render('partials/edit.handlebars', activeButtons(false, true));
+}
+
+let loadBlockData = (callback:() => void) => {
+	fs.readFile('data/blocks.json', (err, data) => {
+		let array = JSON.parse(data.toString());
+
+		/* separate the block data into names and images */
+		array.forEach(block => {
+			blockNames.push(block.name);
+			blockImages.push(block.image);
+		});
+
+		console.log('block data loaded for ' + blockNames.length + ' blocks!');
+
+		callback();
+	});
 }
 
 server.use(express.static('public'));
@@ -38,24 +57,34 @@ server.get('/edit/:data', (req, res, next) => {
 });
 
 server.get('/blocks/:block', (req, res, next) => {
-	let blockPath = req.url;
+	let blockName = req.params['block'];
 
-	fs.exists(blockPath, (exists) => {
-		if (exists)
-			res.sendFile(blockPath);
-		else
-			res.sendFile(__dirname + '/blocks/default.png');
-	});
+	let blockIndex = blockNames.indexOf(blockName);
+
+	/* fallback to debug block for incorrect block */
+	if (blockIndex === -1) {
+		res.sendFile(__dirname + '/blocks/default.png');
+	} else {
+		res.sendFile(__dirname + '/blocks/' + blockImages[blockIndex]);
+	}
 });
 
+/**
+ * the client requests a list of the names for all blocks
+ * 
+ * this value is internally cached as an array
+ */
 server.get('/blockdata', (req, res, next) => {
-	res.sendFile(__dirname + '/data/blocks.json')
+	res.json(blockNames);
 });
 
 server.get('*', (req, res, next) => {
 	res.render('partials/404', activeButtons(false, false));
 });
 
-server.listen(port, () => {
-	console.log('server running on port ' + port);
+/* startup */
+loadBlockData(() => {
+	server.listen(port, () => {
+		console.log('server running on port ' + port + '!');
+	});
 });

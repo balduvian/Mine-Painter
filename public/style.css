@@ -27,6 +27,12 @@ html, body, p, div, button {
 	height: 100px;
 }
 
+#belowHeader {
+	background-color: var(--color0);
+
+	height: calc(100% - 100px);
+}
+
 #headerText {
     position: absolute;
     left: 20px;
@@ -70,9 +76,42 @@ html, body, p, div, button {
 
 #editAll {
 	display: grid;
-	grid-template-rows: 1fr 100px;
+	grid-template-rows: 1fr 150px;
 }
 
 #footer {
     background-color: var(--color1);
+}
+
+#grid {
+	display: grid;
+	/* grid template will be set in the js */
+
+	grid-gap: 5px;
+	padding: 5px;
+	background-color: black;
+
+	width: fit-content;
+	height: fit-content;
+
+	/* center div */
+	position: absolute;
+	top: 50%;
+	left: 50%;
+
+	transform: translate(-50%, -50%)
+}
+
+.space {
+	background-color: aqua;	
+}
+
+/* inventory stuff */
+
+#inventory {
+	position: fixed;
+}
+
+#inventoryButton {
+	position: fixed;
 }
