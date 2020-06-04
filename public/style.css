@@ -4,7 +4,7 @@
     --color2: rgb(72, 72, 72);
 }
 
-html, body, p, div, button {
+html, body, p, div, button, img {
     margin: 0;
     padding: 0;
 
@@ -91,19 +91,30 @@ html, body, p, div, button {
 	padding: 5px;
 	background-color: black;
 
-	width: fit-content;
-	height: fit-content;
+	width: 600px;
+	height: 600px;
 
 	/* center div */
 	position: absolute;
 	top: 50%;
 	left: 50%;
 
-	transform: translate(-50%, -50%)
+	transform: translate(-50%, -50%);
+
+	user-select: none;
+	-webkit-user-drag: none;
 }
 
-.space {
-	background-color: aqua;	
+#grid div {
+	user-select: none;
+	-webkit-user-drag: none;
+}
+
+#grid img {
+	image-rendering: pixelated;
+
+	user-select: none;
+	-webkit-user-drag: none;
 }
 
 /* inventory stuff */

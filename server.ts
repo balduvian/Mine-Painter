@@ -2,6 +2,7 @@
 import * as express from 'express';
 import * as handlebars from 'express-handlebars';
 import * as fs from 'fs';
+import { runInNewContext } from 'vm';
 
 const port = process.env.PORT || 3000;
 let server = express();
@@ -25,6 +26,10 @@ let getEdit = (req, res, next) => {
 let loadBlockData = (callback:() => void) => {
 	fs.readFile('data/blocks.json', (err, data) => {
 		let array = JSON.parse(data.toString());
+
+		/* load air block */
+		blockNames.push('air');
+		blockImages.push('air.png');
 
 		/* separate the block data into names and images */
 		array.forEach(block => {
@@ -51,8 +56,6 @@ server.get('/edit', (req, res, next) => {
 });
 
 server.get('/edit/:data', (req, res, next) => {
-	let data = req.params['data'];
-
 	getEdit(req, res, next);
 });
 
@@ -79,6 +82,8 @@ server.get('/blockdata', (req, res, next) => {
 });
 
 server.get('*', (req, res, next) => {
+	console.log('URL:' + req.url);
+
 	res.render('partials/404', activeButtons(false, false));
 });
 
