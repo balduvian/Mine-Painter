@@ -1,11 +1,7 @@
-const BLOCK_ID_AIR = 0;
+/// <reference path='shared.ts'/>
 
 const GRID_ID = 'grid';
 const SPACE_CLASS = 'space';
-
-const MAX_DIMENSION = 32;
-const DEF_DIMENSION = 8;
-const MIN_DIMENSION = 4;
 
 const HOTBAR_LENGTH = 6;
 
@@ -15,7 +11,9 @@ let blockNames:string[];
 /* representation of the current painting */
 let painting:Painting;
 
-let hotbar: Hotbar;
+let hotbar:Hotbar;
+
+let viewButton:HTMLButtonElement;
 
 interface Block {
 	name: string,
@@ -114,155 +112,10 @@ class Hotbar {
 	}
 }
 
-let debugGenerateData = (width:number, height:number, numBlocks:number) => {
-	let data = toBase66(width) + toBase66(height);
+let setupButtons = () => {
+	viewButton = <HTMLButtonElement>document.getElementById('viewButton');
 
-	for (let i = 0; i < numBlocks; ++i) {
-		data += toBase66((Math.random() * numBlocks));
-	}
-
-	return data;
-}
-
-const BASE_66 = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-._~';
-
-let toBase66 = (int:number) => {
-	return BASE_66.charAt(int);
-}
-
-let fromBase66 = (data:string, position:number) => {
-	let str = data.charAt(position);
-
-	let code = str.charCodeAt(0);
-
-	/* magic ascii values */
-	/* too bad js doesn't have char literals */
-
-	/* -. */
-	if (code < 47) 
-		return code - 42 + 62;
-
-	/* numbers */
-	if (code < 58)
-		return code - 48;
-
-	/* upper case letters */
-	if (code < 91)
-		return code - 65 + 36;
-
-	/* _ */
-	if (code === 95)
-		return 64;
-
-	/* lower case letters */
-	if (code < 123)
-		return code - 97 + 10;
-
-	/* ~ */
-	return 65;
-}
-
-class Painting {
-	width: number;
-	height: number;
-
-	data: number[];
-
-	err: boolean;
-
-	constructor(data?:string) {
-		if (data) {
-			this.setData(data);
-
-		} else {
-			this.err = false;
-			this.setDefault();
-		}
-	}
-
-	toData() {
-		let data = '';
-
-		data += toBase66(this.width);
-		data += toBase66(this.height);
-
-		this.data.forEach(blockID => {
-			data += toBase66(blockID);
-		});
-
-		return data;
-	}
-
-	setData(data:string) {
-		/* do we have enough for a width and height */
-		if (data.length < 4) {
-			console.log('data is too short, must be at least 4 long for width and height!');
-
-			this.err = true;
-			return this.setDefault();
-		}
-
-		this.width = fromBase66(data, 0);
-		this.height = fromBase66(data, 1);
-
-		/* is the painting too big or too small? */
-		if (
-			this.width < MIN_DIMENSION ||
-			this.height < MIN_DIMENSION ||
-			this.width > MAX_DIMENSION ||
-			this.height > MAX_DIMENSION 
-		) {
-			console.log('painting dimensions are not within range, must be at least ' + MIN_DIMENSION + ' and at most ' + MAX_DIMENSION + '!');
-
-			this.err = true;
-			return this.setDefault();
-		}
-
-		let goodLength = this.width * this.height + 2;
-		/* is the amount of information correct for this width and height */
-		if (data.length !== goodLength) {
-			console.log('painting has an incorrect amount of data. should be ' + goodLength + ', had ' + data.length + '!');
-
-			this.err = true;
-			return this.setDefault();
-		}
-
-		this.data = [];
-		for (let i = 0; i < this.width * this.height; ++i) {
-			this.data.push(fromBase66(data, i + 2));
-		}
-
-		/* if we made it this far we are free of errors */
-		this.err = false;
-	}
-
-	/**
-	 * creates an empty painting representation at a default width and height
-	 * 
-	 * guaranteed to work
-	 */
-	setDefault() {
-		this.width = DEF_DIMENSION;
-		this.height = DEF_DIMENSION;
-
-		this.data = new Array(DEF_DIMENSION * DEF_DIMENSION).fill(BLOCK_ID_AIR);
-	}
-
-	/**
-	 * checks if the creation of this painting
-	 * resulted in an error
-	 * 
-	 * sets the error state back to false
-	 */
-	getError() {
-		if (this.err) {
-			this.err = false;
-			return true;
-
-		} else {
-			return false;
-		}
-	}
+	viewButton.onclick = () => getImage(painting);
 }
 
 let getGrid = () => {
@@ -397,6 +250,10 @@ let createGrid = (painting:Painting) => {
 	}, false);
 }
 
+let getImage = (painting: Painting) => {
+	window.open('/image/' + painting.toData(), '_blank');
+}
+
 let getBlockURL = (blockIndex:number) => {
 	return '/blocks/' + blockNames[blockIndex];
 }
@@ -411,15 +268,14 @@ let parseData = (hash:string) => {
 	return new Painting();
 }
 
-let createHotbar = () => {
-
-}
-
-let onStart = (hash:string) => {
+let onStartEdit = (hash:string) => {
 	/* get the block data */
 	let request = new XMLHttpRequest();
 	request.open('GET', '/blockdata');
 	request.send();
+
+	/* set sky color */
+	document.documentElement.style.setProperty('--sky', SKY_COLOR.toCSS());
 
 	/* create the painting from the url */
 	painting = parseData(hash);
@@ -429,6 +285,8 @@ let onStart = (hash:string) => {
 			blockNames = JSON.parse(request.responseText);
 
 			hotbar = new Hotbar(HOTBAR_LENGTH);
+
+			setupButtons();
 
 			/* wait for blocks to load to start creating the painting in the DOM */
 			createGrid(painting);
@@ -445,4 +303,4 @@ let onStart = (hash:string) => {
 	}
 }
 
-onStart(document.location.hash);
+onStartEdit(document.location.hash);

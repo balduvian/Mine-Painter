@@ -2,8 +2,10 @@
     --color0: white;
     --color1: grey;
 	--color2: rgb(72, 72, 72);
-	
-	--sky: #4b98ed;
+	--color3: rgb(52, 52, 52);
+
+	/* will be set in the js */
+	--sky: default;
 }
 
 html, body, p, div, button, img {
@@ -54,8 +56,6 @@ html, body, p, div, button, img {
 }
 
 .headerButton {
-    position: relative;
-
     width: fit-content;
 
     padding-left: 15px;
@@ -177,4 +177,90 @@ html, body, p, div, button, img {
 
 	user-select: none;
 	-webkit-user-drag: none;
+}
+
+.footerButton {
+	float: right;
+
+	width: 80px;
+	height: 80px;
+
+	margin-right: 10px;
+	margin-top: 10px;
+
+	background-color: var(--color3);
+
+	border: 5px solid black;
+
+	color: var(--color1);
+}
+
+.footerButton:hover {
+	background-color: var(--color2);
+	color: var(--color0);
+}
+
+/* gallery stuff */
+
+#galleryHolder {
+	
+}
+
+#gallery {
+	display: flex;
+	
+	flex-direction: row;
+	flex-wrap: wrap;
+
+	justify-content: center;
+	align-items: flex-start;
+	align-content: flex-start;
+
+	overflow-y: scroll;
+}
+
+.galleryItemBack {
+	width: 400px;
+	height: 400px;
+}
+
+.galleryItemBack:hover {
+	background-color: skyblue;
+}
+
+.galleryitem {
+	width: 350px;
+	height: 400px;
+	
+	margin-left: 25px;
+
+	background-color: var(--color1);
+
+	display: grid;
+	grid-template-rows: 1fr 50px;
+	column-gap: 10px;
+}
+
+.pictureHolder {
+	overflow: hidden;
+
+	background-color: var(--color2);
+}
+
+.pictureHolder > img {
+	width: calc(100% - 10px);
+	margin-left: 5px;
+	margin-top: 5px;
+
+	height: auto;
+}
+
+.itemName {
+	line-height: 50px;
+
+	font-size: 25px;
+	color: var(--color2);
+	text-align: center;
+	
+	overflow: hidden;
 }
