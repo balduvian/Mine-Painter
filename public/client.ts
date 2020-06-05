@@ -1,4 +1,4 @@
-const BLOCK_ID_NONE = 0;
+const BLOCK_ID_AIR = 0;
 
 const GRID_ID = 'grid';
 const SPACE_CLASS = 'space';
@@ -7,41 +7,159 @@ const MAX_DIMENSION = 32;
 const DEF_DIMENSION = 8;
 const MIN_DIMENSION = 4;
 
+const HOTBAR_LENGTH = 6;
+
 /* all the blocks the client knows about */
 let blockNames:string[];
 
 /* representation of the current painting */
 let painting:Painting;
 
-let mouseDown: boolean;
+let hotbar: Hotbar;
 
 interface Block {
 	name: string,
 	image: string
 }
 
+class Hotbar {
+	blocks:number[];
+	selected:number;
+
+	div: HTMLDivElement;
+
+	constructor(length:number) {
+		this.blocks = new Array(length);
+		this.selected = 0;
+
+		this.div = <HTMLDivElement>document.getElementById('hotbar');
+		this.div.style.gridTemplateRows = '80px '.repeat(length);
+
+		for (let i = 0; i < length; ++i) {
+			let holder = document.createElement('div');
+			this.div.appendChild(holder);
+
+			let image = document.createElement('img');
+			holder.appendChild(image);
+
+			let blockIndex = i + 1;
+
+			/* fill in the blocks in the hotbar */
+			/* if not enough block data fill air */
+			if (blockIndex < blockNames.length) {
+				this.setSlot(i, blockIndex);
+			} else {
+				this.setSlot(i, 0);
+			}
+
+			let index = i;
+
+			/* selecting this slot */
+			holder.onmousedown = (event) => {
+				if (event.button === 0) {
+					this.select(index);
+				}
+			}
+		}
+
+		window.onkeydown = (event:KeyboardEvent) => {
+			let code = event.keyCode;
+
+			console.log(code);
+
+			/* number keys */
+			if (code >= 49 && code <= 57) {
+				let keySelection = code - 49;
+
+				if (keySelection < this.blocks.length)
+					this.select(keySelection);
+			}
+		}
+
+		/* select first slot */
+		this.select(0);
+	}
+
+	private select(index:number) {
+		let children = this.div.children;
+
+		children[this.selected].classList.remove('selected');
+
+		this.selected = index;
+		children[this.selected].classList.add('selected');
+	}
+
+	private setSlot(index:number, block:number) {
+		this.blocks[index] = block;
+		let img = <HTMLImageElement>this.div.children[index].firstChild;
+
+		img.src = getBlockURL(block);
+	}
+
+	addBlock(block: number) {
+		let indexInHotbar = this.blocks.indexOf(block);
+
+		/* replace the selected block with the new block */
+		if (indexInHotbar === -1) {
+			this.setSlot(this.selected, block);
+
+		/* if we already have the block in our hotbar go to it */
+		} else {
+			this.select(indexInHotbar);
+		}
+	}
+
+	getBlock() {
+		return this.blocks[this.selected];
+	}
+}
+
 let debugGenerateData = (width:number, height:number, numBlocks:number) => {
-	let data = toHex(width) + toHex(height);
+	let data = toBase66(width) + toBase66(height);
 
 	for (let i = 0; i < numBlocks; ++i) {
-		data += toHex((Math.random() * numBlocks));
+		data += toBase66((Math.random() * numBlocks));
 	}
 
 	return data;
 }
 
-let toHex = (int:number) => {
-	let str = int.toString(16);
-	if (str.length == 1)
-		str = '0' + str;
+const BASE_66 = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-._~';
 
-	return str;
+let toBase66 = (int:number) => {
+	return BASE_66.charAt(int);
 }
 
-let fromHex = (data:string, position:number) => {
-	let str = data.substr(position * 2, 2);
+let fromBase66 = (data:string, position:number) => {
+	let str = data.charAt(position);
 
-	return parseInt(str, 16);
+	let code = str.charCodeAt(0);
+
+	/* magic ascii values */
+	/* too bad js doesn't have char literals */
+
+	/* -. */
+	if (code < 47) 
+		return code - 42 + 62;
+
+	/* numbers */
+	if (code < 58)
+		return code - 48;
+
+	/* upper case letters */
+	if (code < 91)
+		return code - 65 + 36;
+
+	/* _ */
+	if (code === 95)
+		return 64;
+
+	/* lower case letters */
+	if (code < 123)
+		return code - 97 + 10;
+
+	/* ~ */
+	return 65;
 }
 
 class Painting {
@@ -65,11 +183,11 @@ class Painting {
 	toData() {
 		let data = '';
 
-		data += toHex(this.width);
-		data += toHex(this.height);
+		data += toBase66(this.width);
+		data += toBase66(this.height);
 
 		this.data.forEach(blockID => {
-			data += toHex(blockID);
+			data += toBase66(blockID);
 		});
 
 		return data;
@@ -84,8 +202,8 @@ class Painting {
 			return this.setDefault();
 		}
 
-		this.width = fromHex(data, 0);
-		this.height = fromHex(data, 1);
+		this.width = fromBase66(data, 0);
+		this.height = fromBase66(data, 1);
 
 		/* is the painting too big or too small? */
 		if (
@@ -100,7 +218,7 @@ class Painting {
 			return this.setDefault();
 		}
 
-		let goodLength = (this.width * this.height + 2) * 2;
+		let goodLength = this.width * this.height + 2;
 		/* is the amount of information correct for this width and height */
 		if (data.length !== goodLength) {
 			console.log('painting has an incorrect amount of data. should be ' + goodLength + ', had ' + data.length + '!');
@@ -111,7 +229,7 @@ class Painting {
 
 		this.data = [];
 		for (let i = 0; i < this.width * this.height; ++i) {
-			this.data.push(fromHex(data, i + 2));
+			this.data.push(fromBase66(data, i + 2));
 		}
 
 		/* if we made it this far we are free of errors */
@@ -127,7 +245,7 @@ class Painting {
 		this.width = DEF_DIMENSION;
 		this.height = DEF_DIMENSION;
 
-		this.data = new Array(DEF_DIMENSION * DEF_DIMENSION).fill(BLOCK_ID_NONE);
+		this.data = new Array(DEF_DIMENSION * DEF_DIMENSION).fill(BLOCK_ID_AIR);
 	}
 
 	/**
@@ -197,28 +315,50 @@ let updateGrid = (painting:Painting) => {
 
 	for (var i = 0; i < painting.width * painting.height; ++i) {
 		let gridImg = <HTMLImageElement>childList[i].firstChild;
-		gridImg.src = getBlockURL(blockNames[painting.data[i]]);
+		gridImg.src = getBlockURL(painting.data[i]);
 	}
 }
 
-let inputHandler = () => {
-	window.onmousedown = () => mouseDown = true;
-	window.onmouseup = () => mouseDown = false;
+/* bitwise detecting which mouse buttons are being pressed */
+
+let leftDown = (buttons:number) => {
+	return (buttons & 0b01) === 0b01;
 }
 
-let onClickSpace = (index:number, gridImg:HTMLImageElement) => {
-	//TODO make this tied to some variable
-	let insertion = 4;
+let rightDown = (buttons:number) => {
+	return (buttons & 0b10) === 0b10;
+}
 
-	/* update in painting representation */
-	painting.data[index] = insertion;
+let middleDown = (buttons:number) => {
+	return (buttons & 0b100) === 0b100;
+}
 
-	/* update in dom */
-	gridImg.src = getBlockURL(blockNames[insertion]);
+let onClickSpace = (index:number, gridImg:HTMLImageElement, buttons:number) => {
+	let left = leftDown(buttons);
+	let right = rightDown(buttons);
+	let middle = middleDown(buttons);
 
-	/* update in hash */
-	let hash = document.location.hash.substr(1);
-	document.location.hash = hash.slice(0, 4 + index * 2) + toHex(insertion) + hash.slice(4 + ((index + 1) * 2));
+	if (left || right) {
+		/* create air if right click */
+		let insertion = left ? hotbar.getBlock() : BLOCK_ID_AIR;
+
+		/* update in painting representation */
+		painting.data[index] = insertion;
+	
+		/* update in dom */
+		gridImg.src = getBlockURL(insertion);
+	
+		/* update in hash */
+		let hash = document.location.hash.substr(1);
+		document.location.hash = hash.slice(0, 2 + index) + toBase66(insertion) + hash.slice(3 + index);
+
+	/* just selecting block */
+	} else if (middle) {
+		let block = painting.data[index];
+
+		if (block != BLOCK_ID_AIR)
+			hotbar.addBlock(block);
+	}
 }
 
 let createGrid = (painting:Painting) => {
@@ -236,22 +376,29 @@ let createGrid = (painting:Painting) => {
 		gridImg.src = '/blocks/' + blockNames[painting.data[i]];
 		gridSpace.appendChild(gridImg);
 
-		let indexNum = i;
+		let gridLines = document.createElement('div');
+		gridLines.className = 'gridlines';
+		gridSpace.appendChild(gridLines);
 
-		gridSpace.onmousedown = (event) => {
-			if (event.button === 0)
-				onClickSpace(indexNum, gridImg);
+		let index = i;
+
+		gridSpace.onmousedown = (event:MouseEvent) => {
+			onClickSpace(index, gridImg, event.buttons);
 		}
 
-		gridSpace.onmousemove = (event) => {
-			if (mouseDown && event.button === 0)
-				onClickSpace(indexNum, gridImg);
+		gridSpace.onmouseover = (event:MouseEvent) => {
+			onClickSpace(index, gridImg, event.buttons);
 		}
 	}
+
+	gridElement.addEventListener('contextmenu', event => { 
+		// do something here... 
+		event.preventDefault();
+	}, false);
 }
 
-let getBlockURL = (imageName:string) => {
-	return '/blocks/' + imageName;
+let getBlockURL = (blockIndex:number) => {
+	return '/blocks/' + blockNames[blockIndex];
 }
 
 let parseData = (hash:string) => {
@@ -264,22 +411,24 @@ let parseData = (hash:string) => {
 	return new Painting();
 }
 
+let createHotbar = () => {
+
+}
+
 let onStart = (hash:string) => {
 	/* get the block data */
 	let request = new XMLHttpRequest();
 	request.open('GET', '/blockdata');
 	request.send();
 
-	inputHandler();
-
 	/* create the painting from the url */
 	painting = parseData(hash);
 
 	request.onreadystatechange = () => {
 		if (request.readyState === 4) {
-			console.log('RESPONSE:' + request.responseText);
-
 			blockNames = JSON.parse(request.responseText);
+
+			hotbar = new Hotbar(HOTBAR_LENGTH);
 
 			/* wait for blocks to load to start creating the painting in the DOM */
 			createGrid(painting);

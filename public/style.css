@@ -1,7 +1,9 @@
 :root {
     --color0: white;
     --color1: grey;
-    --color2: rgb(72, 72, 72);
+	--color2: rgb(72, 72, 72);
+	
+	--sky: #4b98ed;
 }
 
 html, body, p, div, button, img {
@@ -87,9 +89,7 @@ html, body, p, div, button, img {
 	display: grid;
 	/* grid template will be set in the js */
 
-	grid-gap: 5px;
-	padding: 5px;
-	background-color: black;
+	background-color: var(--sky);
 
 	width: 600px;
 	height: 600px;
@@ -117,6 +117,14 @@ html, body, p, div, button, img {
 	-webkit-user-drag: none;
 }
 
+#grid .gridlines {
+	position: absolute;
+	top: 0;
+	left: 0;
+
+	border: 0.5px solid black;
+}
+
 /* inventory stuff */
 
 #inventory {
@@ -125,4 +133,48 @@ html, body, p, div, button, img {
 
 #inventoryButton {
 	position: fixed;
+}
+
+#hotbar {
+	position: absolute;
+
+	height: min-content;
+	width: 80px;
+
+	/* center to the right of the screen */
+	right: 10px;
+	top: 50%;
+	transform: translate(0, -50%);
+
+	display: grid;
+
+	/* only one column */
+	/* rows set by code */
+	grid-template-columns: 1fr;
+
+	user-select: none;
+	-webkit-user-drag: none;
+}
+
+#hotbar > div {
+	background-color: black;
+
+	user-select: none;
+	-webkit-user-drag: none;
+}
+
+#hotbar > .selected {
+	background-color: var(--color1);
+}
+
+#hotbar > div > img {
+	margin: 5px;
+
+	width: calc(100% - 10px);
+	height: calc(100% - 10px);
+
+	image-rendering: pixelated;
+
+	user-select: none;
+	-webkit-user-drag: none;
 }
