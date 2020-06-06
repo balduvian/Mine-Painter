@@ -5,6 +5,7 @@ import * as handlebars from 'express-handlebars';
 import * as fs from 'fs';
 import * as jimp from 'jimp';
 import { Jimp } from '@jimp/core/types/jimp';
+import { createInterface } from 'readline';
 
 let shared = require('./shared');
 
@@ -16,6 +17,8 @@ let blockURLs:Array<string> = [];
 let blockImages:Array<Jimp> = [];
 
 let missingBuffer:Buffer;
+
+let gallery:GalleryItem[];
 
 let activeButtons = (gallery:boolean, edit:boolean) => {
 	const CURRENT_TAG = 'current';
@@ -76,6 +79,47 @@ let loadBlockData = () => {
 	});
 }
 
+let loadGalleryData = () => {
+	return new Promise((accept, reject) => {
+		const path = 'data/gallery.json';
+
+		if (fs.existsSync(path)) {
+			fs.readFile(path, (err, data) => {
+				if (err)
+					reject();
+				else {
+					/* catch bad json */
+					try {
+						gallery = JSON.parse(data.toString());
+					} catch (ex) {
+						gallery = [];
+					}
+
+					if (!Array.isArray(gallery))
+						gallery = [];
+
+					accept();
+				}
+			});
+
+		/* create the gallery json if it doesn't exist */
+		} else {
+			gallery = [];
+			fs.writeFile(path, '[]', err => err ? reject() : accept());
+		}
+	});
+}
+
+let saveGalleryData = () => {
+	console.log('saving gallery data...');
+
+	const path = 'data/gallery.json';
+
+	let data = JSON.stringify(gallery);
+
+	fs.writeFileSync(path, data);
+}
+
 server.use(express.static('public'));
 server.engine('handlebars', handlebars({defaultLayout: 'mine'}));
 server.set('view engine', 'handlebars');
@@ -130,6 +174,76 @@ server.get('/image/:data', (req, res, next) => {
 	});
 });
 
+/* gallery stuff */
+
+server.get('/gallery', (req, res, next) => {
+	res.render('partials/gallery', activeButtons(true, false));
+});
+
+server.get('/galleryList', (req, res, next) => {
+	res.send(gallery);
+});
+
+server.get('/galleryItem/:id', (req, res, next) => {
+	let fail = () => res.status(400).send('incorrect data');
+
+	let id = +req.params['id'];
+
+	if (isNaN(id))
+		fail();
+	else
+		if (id < 0 || id >= gallery.length)
+			fail();
+		else
+			res.send(gallery[id]);
+});
+
+server.get('/deleteGalleryItem/:data', (req, res, next) => {
+	let data = req.params['data'];
+
+	let index = -1;
+
+	/* search for the data in our gallery list */
+	let found = gallery.every((item, i) => {
+		if (item.data === data) {
+			index = i;
+			return false;
+		}
+
+		return true;
+	});
+
+	if (index === -1) {
+		res.status(400).send('could not delete');
+
+	} else {
+		gallery.splice(index, 1);
+		res.send('success');
+	}
+});
+
+server.get('/uploadGallery/:data/:title', (req, res, next) => {
+	let data = req.params['data'];
+	let title = req.params['title'];
+
+	/* validate title */
+	let titleResponse = shared.validateTitle(title);
+	if (titleResponse === '') {
+		/* validate data */
+		let painting = new Painting(data);
+
+		if (painting.getError()) {
+			res.status(400).send('invalid painting data');
+	
+		} else {
+			gallery.push({data:data, title:title});
+			res.send('success');
+		}
+	} else {
+		res.status(400).send(titleResponse);
+	}		
+});
+
 server.get('*', (req, res, next) => {
 	console.log('URL:' + req.url);
 
@@ -137,13 +251,31 @@ server.get('*', (req, res, next) => {
 });
 
 /* startup */
+let cannotStart = () => console.log('server could not start due to an error');
+
 loadBlockData().then(() => {
-	server.listen(port, () => {
-		console.log('server running on port ' + port + '!');
-	});
-}).catch(() => {
-	console.log('server could not start due to an error');
-});
+	loadGalleryData().then(() => {
+		server.listen(port, () => {
+			console.log('server running on port ' + port + '!');
+		});
+
+		process.on('exit', () => {
+			saveGalleryData();
+		});
+
+		process.on('SIGINT', () => {
+			saveGalleryData();
+			process.exit();
+		});
+
+		let input = createInterface(process.stdin, process.stdout);
+
+		input.on('line', line => {
+			if (line === 'q')
+				process.exit();
+		});
+	}).catch(cannotStart);
+}).catch(cannotStart);
 
 /* image stuff */
 

@@ -220,6 +220,9 @@ let createGrid = (painting:Painting) => {
 	gridElement.style.gridTemplateColumns = '1fr '.repeat(painting.width);
 	gridElement.style.gridTemplateRows = '1fr '.repeat(painting.height);
 
+	gridElement.style.setProperty('--paintingWidth', painting.width+'');
+	gridElement.style.setProperty('--paintingHeight', painting.height+'');
+
 	for (var i = 0; i < painting.width * painting.height; ++i) {
 		let gridSpace = document.createElement('div');
 		gridSpace.className = 'space';
@@ -273,9 +276,6 @@ let onStartEdit = (hash:string) => {
 	let request = new XMLHttpRequest();
 	request.open('GET', '/blockdata');
 	request.send();
-
-	/* set sky color */
-	document.documentElement.style.setProperty('--sky', SKY_COLOR.toCSS());
 
 	/* create the painting from the url */
 	painting = parseData(hash);

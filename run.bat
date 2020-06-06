@@ -1,3 +1,6 @@
+::compile handlebars
+call node node_modules/handlebars/bin/handlebars views/partials/galleryItem.handlebars -f public/galleryItem.js
+
 ::compile server
 call tsc server.ts
 

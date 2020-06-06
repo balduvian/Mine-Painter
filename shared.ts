@@ -29,15 +29,19 @@ const MAX_DIMENSION = 32;
 const DEF_DIMENSION = 8;
 const MIN_DIMENSION = 4;
 
+const MIN_TITLE_LENGTH = 2;
+const MAX_TITLE_LENGTH = 32;
+
 let toBase66 = (int:number) => {
 	return BASE_66.charAt(int);
 }
 
 let fromBase66 = (data:string, position:number) => {
-	let str = data.charAt(position);
+	let code = data.charCodeAt(position);
+	return parseBase66(code);
+}
 
-	let code = str.charCodeAt(0);
-
+let parseBase66 = (code:number) => {
 	/* magic ascii values */
 	/* too bad js doesn't have char literals */
 
@@ -62,13 +66,17 @@ let fromBase66 = (data:string, position:number) => {
 		return code - 97 + 10;
 
 	/* ~ */
-	return 65;
+	if (code === 126)
+		return 65;
+
+	/* if it's an invalid base66 character */
+	return -1;
 }
 
 let debugGenerateURL = (width:number, height:number, numBlocks:number) => {
 	let data = toBase66(width) + toBase66(height);
 
-	for (let i = 0; i < numBlocks; ++i) {
+	for (let i = 0; i < width * height; ++i) {
 		data += toBase66((Math.random() * numBlocks));
 	}
 
@@ -178,6 +186,43 @@ class Painting {
 	}
 };
 
+/**
+ * checks if a user submitted title is proper
+ * 
+ * @param title the title to validate
+ * 
+ * @returns an error message or '' (empty string) if the title is acceptible
+ */
+let validateTitle = (title:string) => {
+	let length = title.length;
+
+	if (length < MIN_TITLE_LENGTH)
+		return 'title is too short, must be at least ' + MIN_TITLE_LENGTH + ' characters long';
+
+	if (length > MAX_TITLE_LENGTH) 
+		return 'title is too long, must be at most ' + MAX_TITLE_LENGTH + ' characters long';
+
+	for (let i = 0; i < length; ++i) {
+		let code = title.charCodeAt(i);
+
+		/* only valid base66 characters allowed */
+		if (parseBase66(code) === -1)
+			return 'title contains illegal character at position ' + i + ', (' + title.charAt(i) + ')';
+	}
+
+	return '';
+}
+
+interface GalleryItem {
+	data: string,
+	title: string
+}
+
+/* set sky color */
 try {
-	module.exports = { Color: Color, Painting: Painting, SKY_COLOR: SKY_COLOR };
+	document.documentElement.style.setProperty('--sky', SKY_COLOR.toCSS());
+} catch (ex) {}
+
+try {
+	module.exports = { Color: Color, Painting: Painting, SKY_COLOR: SKY_COLOR, debugGenerateURL: debugGenerateURL };
 } catch (ex) {}
