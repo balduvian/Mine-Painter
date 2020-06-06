@@ -1,8 +1,10 @@
 :root {
-    --color0: white;
-    --color1: grey;
-	--color2: rgb(72, 72, 72);
-	--color3: rgb(52, 52, 52);
+	--color0: rgb(255, 255, 255);
+	--color1: rgb(204, 204, 204);
+    --color2: rgb(153, 153, 153);
+	--color3: rgb(102, 102, 102);
+	--color4: rgb(51, 51, 51);
+	--color5: rgb(0, 0, 0);
 
 	/* will be set in the js */
 	--sky: default;
@@ -19,8 +21,25 @@ html, body, p, div, button, img {
     position: relative;
     box-sizing: border-box;
 
-    color: var(--color2);
     font-family: Arial, Helvetica, sans-serif;
+}
+
+/* fix links being bad */
+
+a:link {
+	text-decoration: none;
+}
+
+a:visited {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: none;
+}
+
+a:active {
+	text-decoration: none;
 }
 
 button:focus {
@@ -28,7 +47,7 @@ button:focus {
 }
 
 #header {
-    background-color: var(--color1);
+    background-color: var(--color2);
 
 	overflow: hidden;
 	
@@ -42,6 +61,8 @@ button:focus {
 }
 
 #headerText {
+	color: var(--color5);
+
     position: absolute;
     left: 20px;
 
@@ -73,11 +94,27 @@ button:focus {
     outline: none;
 
     line-height: 30px;
-    font-size: 20px;
+	font-size: 20px;
+	
+	cursor: pointer;
+
+	color: var(--color5);
 }
 
 .headerButton.current {
-    border-bottom: 5px solid var(--color2);
+    border-bottom: 5px solid var(--color5);
+}
+
+.headerButton:hover {
+	color: var(--color4);
+	background-color: var(--color1);
+	border-color: var(--color4);
+}
+
+.headerButton:active {
+	color: var(--color1);
+	background-color: var(--color3);
+	border-color: var(--color1);
 }
 
 #editAll {
@@ -130,7 +167,7 @@ button:focus {
 	top: 0;
 	left: 0;
 
-	border: 0.5px solid black;
+	border: 0.5px solid var(--color5);
 }
 
 /* inventory stuff */
@@ -159,32 +196,37 @@ button:focus {
 	top: 50%;
 	transform: translate(0, -50%);
 
-	display: grid;
-
-	/* only one column */
-	/* rows set by code */
-	grid-template-columns: 1fr;
-
+	padding-bottom: 5px;
+	
 	user-select: none;
 	-webkit-user-drag: none;
+
+	background-color: var(--color5);
 }
 
 #hotbar > div {
-	background-color: black;
+	width: 80px;
+	height: 70px;
 
 	user-select: none;
 	-webkit-user-drag: none;
+
+	margin-bottom: 5px;
+
+	z-index: 1;
 }
 
 #hotbar > .selected {
-	background-color: var(--color1);
+	z-index: 2;
 }
 
 #hotbar > div > img {
 	margin: 5px;
 
-	width: calc(100% - 10px);
-	height: calc(100% - 10px);
+	position: absolute;
+
+	width: 70px;
+	height: 70px;
 
 	image-rendering: pixelated;
 
@@ -192,25 +234,44 @@ button:focus {
 	-webkit-user-drag: none;
 }
 
-.footerButton {
-	float: right;
+#hotbar > .selected > img {
+	box-sizing: content-box;
+	border: 5px solid var(--color0);
+	outline: 5px solid var(--color5);
+	transform: translate(-5px, -5px);
+	background-color: var(--color0);
+}
 
-	width: 80px;
-	height: 80px;
+/* general buttons */
 
-	margin-right: 10px;
-	margin-top: 10px;
+.mineButton {
+	color: var(--color1);
 
 	background-color: var(--color3);
 
-	border: 5px solid black;
+	border: 5px solid var(--color5);
 
-	color: var(--color1);
+	cursor: pointer;
 }
 
-.footerButton:hover {
-	background-color: var(--color2);
+.mineButton:hover {
 	color: var(--color0);
+	background-color: var(--color2);
+}
+
+.mineButton:active {
+	color: var(--color2);
+	background-color: var(--color4);
+}
+
+.footerButton {
+	float: right;
+
+	width: 130px;
+	height: 130px;
+
+	margin-right: 10px;
+	margin-top: 10px;
 }
 
 /* gallery stuff */
@@ -250,17 +311,31 @@ button:focus {
 }
 
 .pictureHolder > img {
+	position: absolute;
+	image-rendering: pixelated;
+}
+
+.wideImg {
 	width: 100%;
 	height: auto;
 
-	image-rendering: pixelated;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+.tallImg {
+	height: 100%;
+	width: auto;
+
+	left: 50%;
+	transform: translateX(-50%);
 }
 
 .itemName {
 	line-height: 50px;
 
 	font-size: 25px;
-	color: var(--color2);
+	color: var(--color5);
 	text-align: center;
 	
 	overflow: hidden;
@@ -276,32 +351,8 @@ button:focus {
 	height: 50px;
 
 	opacity: 0;
-
-	border: 5px solid black;
-	background-color: var(--color1);
-	color: var(--color0);
-
-	cursor: pointer;
 }
 
-/* fix links being bad */
-
-.deleteButton:hover {
+.galleryItem:hover .deleteButton {
 	opacity: 1;
-}
-
-a:link {
-	text-decoration: none;
-}
-
-a:visited {
-	text-decoration: none;
-}
-
-a:hover {
-	text-decoration: none;
-}
-
-a:active {
-	text-decoration: none;
 }

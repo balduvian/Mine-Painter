@@ -27,12 +27,24 @@ let createGalleryItem = (item:GalleryItem) => {
 
 	gallery.insertAdjacentHTML('beforeend', galleryHTML);
 
+	/* give delete button functionality */
 	let thisData = item.data;
 	let thisDiv = <HTMLDivElement>gallery.lastElementChild;
 
 	(thisDiv.getElementsByClassName('deleteButton')[0] as HTMLElement).onclick = () => {
 		deleteGalleryItem(thisData, thisDiv);
 	};
+
+	/* center the image */
+	centerImage(thisDiv.getElementsByTagName('img')[0]);
+}
+
+let centerImage = (img:HTMLImageElement) => {
+	if (img.naturalWidth > img.naturalHeight) {
+		img.classList.add('wideImg');
+	} else {
+		img.classList.add('tallImg');
+	}
 }
 
 let deleteGalleryItem = (data:string, div:HTMLDivElement) => {
