@@ -10,7 +10,7 @@
 	--sky: default;
 }
 
-html, body, p, div, button, img {
+html, body, p, div, button, img, input {
     margin: 0;
     padding: 0;
 
@@ -22,6 +22,16 @@ html, body, p, div, button, img {
     box-sizing: border-box;
 
     font-family: Arial, Helvetica, sans-serif;
+}
+
+input[type="number"] {
+	-webkit-appearance: textfield;
+	   -moz-appearance: textfield;
+			appearance: textfield;
+}
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+-webkit-appearance: none;
 }
 
 /* fix links being bad */
@@ -355,4 +365,176 @@ button:focus {
 
 .galleryItem:hover .deleteButton {
 	opacity: 1;
+}
+
+/* overlay */
+
+#overlay {
+	position: fixed;
+	z-index: 100;
+
+	top: 0;
+	left: 0;
+
+	background-color: rgba(0, 0, 0, 0.85);
+
+	display: none;
+}
+
+#overlay.active {
+	display: block;
+}
+
+#dialogBack {
+	width: fit-content;
+	height: fit-content;
+
+	box-sizing: content-box;
+
+	border: 5px solid var(--color5);
+	background-color: var(--color2);
+
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+}
+
+/* resizing */
+
+.resizeLayout {
+	display: grid;
+
+	grid-template-columns: 1fr;
+	grid-template-rows: 50px 215px 50px;
+
+	row-gap: 5px;
+	padding: 10px;
+}
+
+.resizeTitle {
+	color: var(--color5);
+
+	line-height: 50px;
+	font-size: 40px;
+
+	text-align: left;
+}
+
+.resizeMain {
+	display: grid;
+
+	grid-template-columns: 215px 430px;
+	grid-template-rows: 1fr;
+
+	column-gap: 10px;
+}
+
+.arrowGrid {
+	display: grid;
+
+	width: 215px;
+	height: 215px;
+
+	grid-gap: 5px;
+	padding: 5px;
+
+	background-color: var(--color5);
+
+	grid-template-rows: 1fr 1fr 1fr;
+	grid-template-columns: 1fr 1fr 1fr;
+}
+
+.arrowGrid > button {
+	background-color: var(--color2);
+
+	border: none;
+}
+
+.arrowGrid > button:hover {
+	background-color: var(--color1);
+}
+
+.arrowGrid > button.active {
+	background-color: var(--color3);
+}
+
+
+.resizeDimensions {
+	display: grid;
+
+	grid-template-rows: 1fr 1fr 1fr 1fr;
+	grid-template-columns: 1fr;
+
+	row-gap: 5px;
+
+	height: 100%;
+}
+
+p.dimensionRow {
+	text-align: left;
+	color: var(--color5);
+
+	font-size: 40px;
+	line-height: 50px;
+}
+
+.dimensionLabel {
+	display: inline;
+
+	text-align: left;
+	color: var(--color4);
+
+	line-height: 50px;
+
+	font-size: 25px;
+	vertical-align: bottom;
+}
+
+.dimensionInput {
+	display: inline;
+
+	width: 75px;
+	height: 50px;
+
+	background-color: var(--color3);
+
+	color: var(--color5);
+
+	box-sizing: border-box;
+	border: 5px solid black;
+
+	padding-left: 5px;
+	padding-right: 5px;
+
+	font-size: 25px;
+	line-height: 50px;
+}
+
+.dimensionInput:focus {
+	outline: none;
+	border-color: var(--color0);
+}
+
+.dimensionInput:disabled {
+	background-color: var(--color4);
+	color: var(--color1);
+}
+
+.dimensionInput:invalid {
+	color: maroon;
+}
+
+.resizeButton {
+	width: 150px;
+	float: right;
+
+	text-align: center;
+
+	font-size: 25px;
+	line-height: 45px;
+}
+
+.resizeButton:last-child {
+	margin-right: 10px;
 }

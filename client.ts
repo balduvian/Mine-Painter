@@ -1,5 +1,7 @@
 /// <reference path='shared.ts'/>
 
+var Handlebars;
+
 const GRID_ID = 'grid';
 const SPACE_CLASS = 'space';
 
@@ -12,8 +14,6 @@ let blockNames:string[];
 let painting:Painting;
 
 let hotbar:Hotbar;
-
-let viewButton:HTMLButtonElement;
 
 interface Block {
 	name: string,
@@ -63,8 +63,6 @@ class Hotbar {
 		window.onkeydown = (event:KeyboardEvent) => {
 			let code = event.keyCode;
 
-			console.log(code);
-
 			/* number keys */
 			if (code >= 49 && code <= 57) {
 				let keySelection = code - 49;
@@ -112,10 +110,16 @@ class Hotbar {
 	}
 }
 
-let setupButtons = () => {
-	viewButton = <HTMLButtonElement>document.getElementById('viewButton');
+let getPainting = () => {
+	return painting;
+}
 
-	viewButton.onclick = () => getImage(painting);
+let setupButtons = () => {
+	let viewButton = <HTMLButtonElement>document.getElementById('viewButton');
+	viewButton.onclick = () => getImage(getPainting());
+
+	let resizeButton = <HTMLButtonElement>document.getElementById('resizeButton');
+	resizeButton.onclick = () => openOverlay(createResize);
 }
 
 let getGrid = () => {
@@ -147,9 +151,6 @@ let hashUpdate = (hash) => {
 	let oldPainting = painting;
 	let err:Error = undefined;
 	painting = parseData(hash);
-
-	console.log(err);
-	console.log(!err);
 
 	if (!painting.getError() && oldPainting.width === painting.width && oldPainting.height === painting.height) {
 		/* we can just replace the blocks if width and height is the same */
@@ -251,6 +252,167 @@ let createGrid = (painting:Painting) => {
 		// do something here... 
 		event.preventDefault();
 	}, false);
+}
+
+let getOverlay = () => {
+	return <HTMLDivElement>document.getElementById('overlay');
+}
+
+let resize = (newWidth:number, newHeight:number, oldPainting:Painting, offsetX:number, offsetY:number) => {
+	/* fill a new sheet with air */
+	let newSheet = new Array(newWidth * newHeight).fill(BLOCK_ID_AIR);
+
+	let oldWidth = oldPainting.width;
+	let oldHeight = oldPainting.height;
+	let oldSheet = oldPainting.data;
+
+	/* copy transformed data into new sheet */
+	for (let i = 0; i < oldWidth; ++i) {
+		for (let j = 0; j < oldHeight; ++j) {
+			let oldPosition = j * oldWidth + i;
+			let newPosition = (j + offsetY) * newWidth + (i + offsetX);
+
+			newSheet[newPosition] = oldSheet[oldPosition];
+		}
+	}
+
+	painting = new Painting(newSheet, newWidth);
+	createGrid(painting);
+	setHash(painting);
+}
+
+let createResize = (parent:HTMLDivElement) => {
+	let dialogHTML = <string>Handlebars.templates.resizeDialog({
+		oldWidth: painting.width,
+		oldHeight: painting.height
+	});
+	parent.insertAdjacentHTML('beforeend', dialogHTML);
+
+	/* edit functionality */
+
+	let dialog = document.getElementById('dialogBack');
+
+	let arrows = Array.from((dialog.getElementsByClassName('arrowGrid')[0] as HTMLDivElement).children) as HTMLButtonElement[];
+	arrows.forEach(button => {
+		let thisButton = button;
+
+		button.onclick = (event) => {
+			/* remove active from the rest */
+			arrows.forEach(loopButton => {
+				loopButton.classList.remove('active');
+			});
+
+			/* put active on this */
+			thisButton.classList.add('active');
+		}
+	})
+
+	let inputs = Array.from(dialog.getElementsByClassName('dimensionInput') as HTMLCollectionOf<HTMLInputElement>);
+	inputs.forEach(input => {
+		if (input.classList.contains('fakeInput')) {
+			input.disabled = true;
+
+		} else {
+			input.maxLength = 2;
+			input.min = MIN_DIMENSION + '';
+			input.max = MAX_DIMENSION + '';
+			input.type = 'number';
+
+			input.onblur = event => {
+				let value = +(event.target as HTMLInputElement).value;
+				if (value < MIN_DIMENSION)
+					input.value = MIN_DIMENSION + '';
+				else if (value > MAX_DIMENSION)
+					input.value = MAX_DIMENSION + '';
+			}
+		}
+	});
+
+	let ok = document.getElementById('okButton') as HTMLButtonElement;
+	ok.onclick = () => {
+		/* validate input */
+		let widthInput = document.getElementById('widthInput') as HTMLInputElement;
+		let heightInput = document.getElementById('heightInput') as HTMLInputElement;
+
+		let width = +widthInput.value;
+		let height = +heightInput.value;
+
+		let err = '';
+		const tooSmall = ' is too small. Should be at least ' + MIN_DIMENSION;
+		const tooLarge = ' is too large. Should be at least ' + MIN_DIMENSION;
+
+		if (isNaN(width) || width === 0)
+			err = 'Please enter a value for width';
+		else if (isNaN(height) || height === 0)
+			err = 'Please enter a value for height';
+		else if (width < MIN_DIMENSION)
+			err = 'width' + tooSmall;
+		else if (width > MAX_DIMENSION)
+			err = 'width' + tooLarge;
+		else if (height < MIN_DIMENSION)
+			err = 'height' + tooSmall;
+		else if (height > MAX_DIMENSION)
+			err = 'height' + tooLarge;
+
+		if (err === '') {
+			/* find out how much offset we need to move the painting by */
+			let fullW = width - painting.height;
+			let halfW = Math.floor(fullW / 2);
+			let fullH = height - painting.height;
+			let halfH = Math.floor(fullH / 2);
+
+			let xLookup = [
+				0, halfW, fullW,
+				0, halfW, fullW,
+				0, halfW, fullW,
+			];
+
+			let yLookup = [
+				0, 0, 0,
+				halfH, halfH, halfH,
+				fullH, fullH, fullH,
+			]
+
+			/* find the index of the button that we pressed */
+			let activeButton = 0;
+			arrows.every((button, index) => {
+				if (button.classList.contains('active')) {
+					activeButton = index;
+					return false;
+				}
+
+				return true;
+			});
+
+			resize(width, height, painting, xLookup[activeButton], yLookup[activeButton]);
+			closeOverlay();
+		} else {
+			alert(err);
+		}
+	}
+
+	let cancel = document.getElementById('cancelButton') as HTMLButtonElement;
+	cancel.onclick = closeOverlay;
+}
+
+let openOverlay = (createDialog:(parent:HTMLDivElement) => void) => {
+	let overlay = getOverlay();
+
+	/* add the dialog box to the overlay */
+	createDialog(overlay);
+
+	overlay.classList.add('active');
+}
+
+let closeOverlay = () => {
+	let overlay = getOverlay();
+
+	/* remove the dialog box that was created on the overlay */
+	while (overlay.firstChild)
+		overlay.firstChild.remove();
+
+	/* hide the overlay */
+	overlay.classList.remove('active');
 }
 
 let getImage = (painting: Painting) => {

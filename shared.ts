@@ -1,4 +1,3 @@
-
 class Color {
 	r: number;
 	g: number;
@@ -91,9 +90,12 @@ class Painting {
 
 	err: boolean;
 
-	constructor(data?:string) {
+	constructor(data?:string | number[], width?:number) {
 		if (data) {
-			this.setData(data);
+			if (Array.isArray(data))
+				this.setArray(data, width);
+			else
+				this.setData(data);
 
 		} else {
 			this.err = false;
@@ -155,6 +157,14 @@ class Painting {
 
 		/* if we made it this far we are free of errors */
 		this.err = false;
+	}
+
+	setArray(array:number[], width:number) {
+		this.data = array;
+		this.err = false;
+
+		this.width = width;
+		this.height = Math.floor(array.length / width);
 	}
 
 	/**

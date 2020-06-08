@@ -1,0 +1,38 @@
+<div id = "dialogBack">
+	<div class = "resizeLayout">
+		<p class = "resizeTitle">Resize</p>
+		<div class = "resizeMain">
+			<div class = "arrowGrid">
+				<button><img src='svg/arrow_ul.svg'></button>
+				<button><img src='svg/arrow_u.svg'></button>
+				<button><img src='svg/arrow_ur.svg'></button>
+				<button><img src='svg/arrow_l.svg'></button>
+				<button class = 'active'><img src='svg/dot.svg'></button>
+				<button><img src='svg/arrow_r.svg'></button>
+				<button><img src='svg/arrow_dl.svg'></button>
+				<button><img src='svg/arrow_d.svg'></button>
+				<button><img src='svg/arrow_dr.svg'></button>
+			</div>
+			<div class = "resizeDimensions">
+				<p class = "dimensionRow">Old Dimensions</p>
+				<div class = "dimensionRow">
+					<p class = "dimensionLabel">w:</p>
+					<input class = "dimensionInput fakeInput" value="{{ oldWidth }}">
+					<p class = "dimensionLabel">h:</p>
+					<input class = "dimensionInput fakeInput" value="{{ oldHeight }}">
+				</div>
+				<p class = "dimensionRow">New Dimensions</p>
+				<div class = "dimensionRow">
+					<p class = "dimensionLabel">w:</p>
+					<input id = "widthInput", class = "dimensionInput">
+					<p class = "dimensionLabel">h:</p>
+					<input id = "heightInput", class = "dimensionInput">
+				</div>
+			</div>
+		</div>
+		<div class = "resizeBottom">
+			<div id = "okButton" class = "resizeButton mineButton">OK</div>
+			<div id = "cancelButton" class = "resizeButton mineButton">Cancel</div>
+		</div>
+	</div>
+</div>
