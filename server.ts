@@ -66,14 +66,19 @@ let loadBlockData = () => {
 			for (let i = 0; i < maxImages; ++i) {
 				let index = i;
 
-				jimp.read('blocks/' + blockURLs[index]).then(image => {
+				let blockURL = 'blocks/' + blockURLs[index];
+
+				jimp.read(blockURL).then(image => {
 					blockImages[index] = image;
 
 					++imagesCreated;
 
 					if (imagesCreated === maxImages)
 						accept();
-				}).catch(reject);
+				}).catch(() => {
+					console.log('failed to read: ' + blockURL);
+					reject();
+				});
 			}
 		});
 	});

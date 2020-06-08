@@ -50,5 +50,141 @@
 	{
 		"name": "diamond ore",
 		"image": "diamond_ore.png"
+	},
+	{
+		"name": "andesite",
+		"image": "andesite.png"
+	},
+	{
+		"name": "bedrock",
+		"image": "bedrock.png"
+	},
+	{
+		"name": "cactus",
+		"image": "cactus_side.png"
+	},
+	{
+		"name": "pumpkin",
+		"image": "carved_pumpkin.png"
+	},
+	{
+		"name": "chest",
+		"image": "chest.png"
+	},
+	{
+		"name": "cornflower",
+		"image": "cornflower.png"
+	},
+	{
+		"name": "crafting table",
+		"image": "crafting_table_front.png"
+	},
+	{
+		"name": "dandelion",
+		"image": "dandelion.png"
+	},
+	{
+		"name": "diorite",
+		"image": "diorite.png"
+	},
+	{
+		"name": "fire",
+		"image": "fire_0.png"
+	},
+	{
+		"name": "furnace",
+		"image": "furnace_front.png"
+	},
+	{
+		"name": "lit furnace",
+		"image": "furnace_front_on.png"
+	},
+	{
+		"name": "glass",
+		"image": "glass.png"
+	},
+	{
+		"name": "granite",
+		"image": "granite.png"
+	},
+	{
+		"name": "tall grass",
+		"image": "grass.png"
+	},
+	{
+		"name": "grass snow",
+		"image": "grass_block_snow.png"
+	},
+	{
+		"name": "ice",
+		"image": "ice.png"
+	},
+	{
+		"name": "jack o lantern",
+		"image": "jack_o_lantern.png"
+	},
+	{
+		"name": "lava",
+		"image": "lava_still.png"
+	},
+	{
+		"name": "fence",
+		"image": "oak_fence.png"
+	},
+	{
+		"name": "planks",
+		"image": "oak_planks.png"
+	},
+	{
+		"name": "obsidian",
+		"image": "obsidian.png"
+	},
+	{
+		"name": "oxeye daisy",
+		"image": "oxeye_daisy.png"
+	},
+	{
+		"name": "polished andesite",
+		"image": "polished_andesite.png"
+	},
+	{
+		"name": "polished diorite",
+		"image": "polished_diorite.png"
+	},
+	{
+		"name": "polished granite",
+		"image": "polished_granite.png"
+	},
+	{
+		"name": "sand",
+		"image": "sand.png"
+	},
+	{
+		"name": "slab",
+		"image": "smooth_stone_slab.png"
+	},
+	{
+		"name": "slabs",
+		"image": "smooth_stone_slab_side.png"
+	},
+	{
+		"name": "snow",
+		"image": "snow.png"
+	},
+	{
+		"name": "stone bricks",
+		"image": "stone_bricks.png"
+	},
+	{
+		"name": "tnt",
+		"image": "tnt_side.png"
+	},
+	{
+		"name": "water",
+		"image": "water_still.png"
+	},
+	{
+		"name": "wheat",
+		"image": "wheat_stage7.png"
 	}
 ]

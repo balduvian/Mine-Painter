@@ -56,6 +56,28 @@ button:focus {
 	outline: none;
 }
 
+/* general buttons */
+
+.mineButton {
+	color: var(--color1);
+
+	background-color: var(--color3);
+
+	border: 5px solid var(--color5);
+
+	cursor: pointer;
+}
+
+.mineButton:hover {
+	color: var(--color0);
+	background-color: var(--color2);
+}
+
+.mineButton:active {
+	color: var(--color2);
+	background-color: var(--color4);
+}
+
 #header {
     background-color: var(--color2);
 
@@ -182,18 +204,117 @@ button:focus {
 
 /* inventory stuff */
 
-#galleryHolder {
+#inventory {
+	display: none;
+
 	position: absolute;
-	top: 0;
+	left: 0;
+
+	width: 280px;
+
+	grid-template-columns: 1fr;
+	grid-template-rows: 1fr 100px;
+
+	background-color: rgba(30, 30, 30, 0.75);
 }
 
-#inventory {
-	position: fixed;
+#holder {
+	overflow-y: scroll;
+	overflow-x: hidden;
+
+	padding: 10px;
+
+	display: grid;
+	grid-template-columns: 80px 80px 80px;
+	column-gap: 10px;
+}
+
+#holder::-webkit-scrollbar {
+	width: 10px;
+}
+
+#holder::-webkit-scrollbar-track {
+	background: none;
+}
+
+#holder::-webkit-scrollbar-thumb {
+	background-color: var(--color4); 
+}
+
+#holder > img {
+	width: 80px;
+	height: 80px;
+
+	image-rendering: pixelated;
+
+	cursor: pointer;
+
+	margin-bottom: 10px;
+}
+
+#holder > img:hover {
+	filter: brightness(1.5);
+}
+
+#holder > img:active {
+	filter: brightness(0.75);
+}
+
+#inventory.active {
+	display: grid;
+}
+
+#backButton {
+	color: var(--color0);
+	text-align: center;
+
+	border: none;
+
+	background: none;
+}
+
+#backButton:hover {
+	background-color: var(--color3);
+}
+
+#backButton:active {
+	background-color: var(--color5);
 }
 
 #inventoryButton {
-	position: fixed;
+	display: none;
+
+	position: absolute;
+
+	left: 10px;
+	bottom: 10px;
+
+	width: 80px;
+	height: 80px;
+
+	text-align: center;
+
+	background-color: rgba(30, 30, 30, 0.75);
+	color: var(--color1);
+
+	border: none;
 }
+
+#inventoryButton.active {
+	display: block;
+}
+
+#inventoryButton.active:hover {
+	background-color: rgba(60, 60, 60, 0.75);
+	color: var(--color0);
+}
+
+#inventoryButton.active:active {
+	background-color: rgba(0, 0, 0, 0.75);
+	color: var(--color2);
+}
+
+/* hotbar stuff */
 
 #hotbar {
 	position: absolute;
@@ -252,28 +373,6 @@ button:focus {
 	background-color: var(--color0);
 }
 
-/* general buttons */
-
-.mineButton {
-	color: var(--color1);
-
-	background-color: var(--color3);
-
-	border: 5px solid var(--color5);
-
-	cursor: pointer;
-}
-
-.mineButton:hover {
-	color: var(--color0);
-	background-color: var(--color2);
-}
-
-.mineButton:active {
-	color: var(--color2);
-	background-color: var(--color4);
-}
-
 .footerButton {
 	float: right;
 
@@ -285,6 +384,11 @@ button:focus {
 }
 
 /* gallery stuff */
+
+#galleryHolder {
+	position: absolute;
+	top: 0;
+}
 
 #gallery {
 	--columns: 5;
@@ -408,7 +512,7 @@ button:focus {
 	grid-template-columns: 1fr;
 	grid-template-rows: 50px 215px 50px;
 
-	row-gap: 5px;
+	row-gap: 10px;
 	padding: 10px;
 }
 

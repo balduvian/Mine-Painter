@@ -110,16 +110,18 @@ class Hotbar {
 	}
 }
 
-let getPainting = () => {
-	return painting;
-}
-
 let setupButtons = () => {
-	let viewButton = <HTMLButtonElement>document.getElementById('viewButton');
-	viewButton.onclick = () => getImage(getPainting());
+	let viewButton = document.getElementById('viewButton') as HTMLButtonElement;
+	viewButton.onclick = () => getImage(painting);
 
-	let resizeButton = <HTMLButtonElement>document.getElementById('resizeButton');
+	let resizeButton = document.getElementById('resizeButton') as HTMLButtonElement;
 	resizeButton.onclick = () => openOverlay(createResize);
+
+	let inventoryButton = getInventoryButton();
+	inventoryButton.onclick = openInventory;
+
+	let backButton = document.getElementById('backButton') as HTMLButtonElement;
+	backButton.onclick = closeInventory;
 }
 
 let getGrid = () => {
@@ -252,6 +254,49 @@ let createGrid = (painting:Painting) => {
 		// do something here... 
 		event.preventDefault();
 	}, false);
+}
+
+let getInventory = () => {
+	return document.getElementById('inventory') as HTMLDivElement;
+}
+
+let getInventoryButton = () => {
+	return document.getElementById('inventoryButton') as HTMLButtonElement;
+}
+
+let fillInventory = (blockNames:string[]) => {
+	let holder = document.getElementById('holder') as HTMLDivElement;
+
+	let numBlocks = blockNames.length;
+
+	for (let i = 1; i < numBlocks; ++i) {
+		let blockImg = document.createElement('img');
+		blockImg.src = getBlockURL(i);
+
+		let index = i;
+
+		blockImg.onclick = () => {
+			hotbar.addBlock(index);
+		}
+
+		holder.appendChild(blockImg);
+	}
+}
+
+let openInventory = () => {
+	let inventory = getInventory();
+	let button = getInventoryButton();
+
+	inventory.classList.add('active');
+	button.classList.remove('active');
+}
+
+let closeInventory = () => {
+	let inventory = getInventory();
+	let button = getInventoryButton();
+
+	inventory.classList.remove('active');
+	button.classList.add('active');
 }
 
 let getOverlay = () => {
@@ -447,6 +492,7 @@ let onStartEdit = (hash:string) => {
 			blockNames = JSON.parse(request.responseText);
 
 			hotbar = new Hotbar(HOTBAR_LENGTH);
+			fillInventory(blockNames);
 
 			setupButtons();
 
