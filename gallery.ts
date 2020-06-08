@@ -6,20 +6,6 @@ let getGallery = () => {
 	return <HTMLDivElement>document.getElementById('gallery');
 }
 
-let request = (url:string) => {
-	return new Promise<string>((accept, reject) => {
-		let request = new XMLHttpRequest();
-		request.open('GET', url);
-	
-		request.onreadystatechange = () => {
-			if (request.readyState === 4)
-				request.status === 200 ? accept(request.responseText) : reject();
-		}
-	
-		request.send();
-	});
-}
-
 let createGalleryItem = (item:GalleryItem) => {
 	let gallery = getGallery();
 

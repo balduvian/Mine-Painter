@@ -1,6 +1,7 @@
 ::compile handlebars
 call node node_modules/handlebars/bin/handlebars views/partials/galleryItem.handlebars -f public/galleryItem.js
 call node node_modules/handlebars/bin/handlebars views/partials/resizeDialog.handlebars -f public/resizeDialog.js
+call node node_modules/handlebars/bin/handlebars views/partials/saveDialog.handlebars -f public/saveDialog.js
 
 ::compile server
 call tsc server.ts

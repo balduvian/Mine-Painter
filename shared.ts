@@ -44,6 +44,9 @@ let parseBase66 = (code:number) => {
 	/* magic ascii values */
 	/* too bad js doesn't have char literals */
 
+	if (code < 45)
+		return -1;
+
 	/* -. */
 	if (code < 47) 
 		return code - 42 + 62;
@@ -207,18 +210,10 @@ let validateTitle = (title:string) => {
 	let length = title.length;
 
 	if (length < MIN_TITLE_LENGTH)
-		return 'title is too short, must be at least ' + MIN_TITLE_LENGTH + ' characters long';
+		return 'Title is too short, must be at least ' + MIN_TITLE_LENGTH + ' characters long';
 
 	if (length > MAX_TITLE_LENGTH) 
-		return 'title is too long, must be at most ' + MAX_TITLE_LENGTH + ' characters long';
-
-	for (let i = 0; i < length; ++i) {
-		let code = title.charCodeAt(i);
-
-		/* only valid base66 characters allowed */
-		if (parseBase66(code) === -1)
-			return 'title contains illegal character at position ' + i + ', (' + title.charAt(i) + ')';
-	}
+		return 'Title is too long, must be at most ' + MAX_TITLE_LENGTH + ' characters long';
 
 	return '';
 }
@@ -228,11 +223,25 @@ interface GalleryItem {
 	title: string
 }
 
+let request = (url:string) => {
+	return new Promise<string>((accept, reject) => {
+		let request = new XMLHttpRequest();
+		request.open('GET', url);
+	
+		request.onreadystatechange = () => {
+			if (request.readyState === 4)
+				request.status === 200 ? accept(request.responseText) : reject(request.responseText);
+		}
+	
+		request.send();
+	});
+}
+
 /* set sky color */
 try {
 	document.documentElement.style.setProperty('--sky', SKY_COLOR.toCSS());
 } catch (ex) {}
 
 try {
-	module.exports = { Color: Color, Painting: Painting, SKY_COLOR: SKY_COLOR, debugGenerateURL: debugGenerateURL };
+	module.exports = { Color: Color, Painting: Painting, SKY_COLOR: SKY_COLOR, debugGenerateURL: debugGenerateURL, validateTitle: validateTitle };
 } catch (ex) {}

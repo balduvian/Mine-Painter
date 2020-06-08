@@ -117,6 +117,9 @@ let setupButtons = () => {
 	let resizeButton = document.getElementById('resizeButton') as HTMLButtonElement;
 	resizeButton.onclick = () => openOverlay(createResize);
 
+	let saveButton = document.getElementById('saveButton') as HTMLButtonElement;
+	saveButton.onclick = () => openOverlay(createSave);
+
 	let inventoryButton = getInventoryButton();
 	inventoryButton.onclick = openInventory;
 
@@ -433,6 +436,54 @@ let createResize = (parent:HTMLDivElement) => {
 			closeOverlay();
 		} else {
 			alert(err);
+		}
+	}
+
+	let cancel = document.getElementById('cancelButton') as HTMLButtonElement;
+	cancel.onclick = closeOverlay;
+}
+
+let createSave = (parent:HTMLDivElement) => {
+	let dialogHTML = <string>Handlebars.templates.saveDialog();
+	parent.insertAdjacentHTML('beforeend', dialogHTML);
+
+	/* edit functionality */
+
+	let ok = document.getElementById('okButton');
+	ok.onclick = () => {
+		/* can't spam requests */
+		if (!ok.classList.contains('loading')) {
+			let fail = (reason:string) => {
+				ok.classList.remove('loading');
+
+				let saveInfo = dialog.getElementsByClassName('saveInfo')[0] as HTMLParagraphElement;
+
+				saveInfo.classList.add('bad');
+				saveInfo.textContent = reason;
+			}
+
+			ok.classList.add('loading');
+
+			let dialog = document.getElementById('dialogBack');
+			let input = dialog.getElementsByTagName('input')[0];
+
+			let submitName = input.value;
+			if (submitName === '')
+				return fail('Please enter a name');
+
+			let nameErr = validateTitle(submitName);
+			if (nameErr !== '')
+				return fail(nameErr);
+
+			request('/uploadGallery/' + painting.toData() + '/' + submitName).then(() => {
+				closeOverlay();
+
+			}).catch(errMessage => {
+				if (typeof errMessage === 'string')
+					fail(errMessage);
+				else
+					fail('Unknown error');
+			});
 		}
 	}
 

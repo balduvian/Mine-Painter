@@ -235,7 +235,7 @@ server.get('/uploadGallery/:data/:title', (req, res, next) => {
 	let titleResponse = shared.validateTitle(title);
 	if (titleResponse === '') {
 		/* validate data */
-		let painting = new Painting(data);
+		let painting = new shared.Painting(data);
 
 		if (painting.getError()) {
 			res.status(400).send('invalid painting data');
