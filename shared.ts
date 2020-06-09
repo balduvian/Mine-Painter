@@ -10,15 +10,23 @@ class Color {
 	}
 
 	toHex() {
-		return (this.r << 24) | (this.g << 16) | (this.b << 8) | 0xff;
+		return ((this.r << 24) | (this.g << 16) | (this.b << 8) | 0xff) >>> 0;
 	}
 
 	toCSS() {
-		return '#' + this.toHex().toString(16);
+		return 'rgb(' + this.r + ',' + this.g + ',' + this.b + ')';
 	}
 };
 
-const SKY_COLOR = new Color(20, 215, 250);
+const SKY_COLORS = [
+	new Color(20, 215, 250),
+	new Color(250, 135, 11),
+	new Color(9, 9, 9)
+];
+
+const SKY_DAY = 0;
+const SKY_SUNSET = 1;
+const SKY_NIGHT = 2;
 
 const BASE_66 = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-._~';
 
@@ -85,18 +93,21 @@ let debugGenerateURL = (width:number, height:number, numBlocks:number) => {
 	return data;
 }
 
+const PAINTING_HEADER_SIZE = 3;
+
 class Painting {
 	width: number;
 	height: number;
+	sky: number;
 
 	data: number[];
 
 	err: boolean;
 
-	constructor(data?:string | number[], width?:number) {
+	constructor(data?:string | number[], width?:number, sky?:number) {
 		if (data) {
 			if (Array.isArray(data))
-				this.setArray(data, width);
+				this.setArray(data, width, sky);
 			else
 				this.setData(data);
 
@@ -111,6 +122,7 @@ class Painting {
 
 		data += toBase66(this.width);
 		data += toBase66(this.height);
+		data += toBase66(this.sky);
 
 		this.data.forEach(blockID => {
 			data += toBase66(blockID);
@@ -121,15 +133,14 @@ class Painting {
 
 	setData(data:string) {
 		/* do we have enough for a width and height */
-		if (data.length < 4) {
-			console.log('data is too short, must be at least 4 long for width and height!');
-
+		if (data.length < PAINTING_HEADER_SIZE) {
 			this.err = true;
 			return this.setDefault();
 		}
 
 		this.width = fromBase66(data, 0);
 		this.height = fromBase66(data, 1);
+		this.sky = fromBase66(data, 2);
 
 		/* is the painting too big or too small? */
 		if (
@@ -138,33 +149,34 @@ class Painting {
 			this.width > MAX_DIMENSION ||
 			this.height > MAX_DIMENSION 
 		) {
-			console.log('painting dimensions are not within range, must be at least ' + MIN_DIMENSION + ' and at most ' + MAX_DIMENSION + '!');
-
 			this.err = true;
 			return this.setDefault();
 		}
 
-		let goodLength = this.width * this.height + 2;
+		if (this.sky < 0 || this.sky >= SKY_COLORS.length) {
+			this.err = true;
+			return this.setDefault();
+		}
+
+		let goodLength = this.width * this.height + PAINTING_HEADER_SIZE;
 		/* is the amount of information correct for this width and height */
 		if (data.length !== goodLength) {
-			console.log('painting has an incorrect amount of data. should be ' + goodLength + ', had ' + data.length + '!');
-
 			this.err = true;
 			return this.setDefault();
 		}
 
 		this.data = [];
-		for (let i = 0; i < this.width * this.height; ++i) {
-			this.data.push(fromBase66(data, i + 2));
-		}
+		for (let i = 0; i < this.width * this.height; ++i)
+			this.data.push(fromBase66(data, i + PAINTING_HEADER_SIZE));
 
 		/* if we made it this far we are free of errors */
 		this.err = false;
 	}
 
-	setArray(array:number[], width:number) {
+	setArray(array:number[], width:number, sky:number) {
 		this.data = array;
 		this.err = false;
+		this.sky = sky;
 
 		this.width = width;
 		this.height = Math.floor(array.length / width);
@@ -178,6 +190,7 @@ class Painting {
 	setDefault() {
 		this.width = DEF_DIMENSION;
 		this.height = DEF_DIMENSION;
+		this.sky = SKY_DAY;
 
 		this.data = new Array(DEF_DIMENSION * DEF_DIMENSION).fill(BLOCK_ID_AIR);
 	}
@@ -237,11 +250,6 @@ let request = (url:string) => {
 	});
 }
 
-/* set sky color */
 try {
-	document.documentElement.style.setProperty('--sky', SKY_COLOR.toCSS());
-} catch (ex) {}
-
-try {
-	module.exports = { Color: Color, Painting: Painting, SKY_COLOR: SKY_COLOR, debugGenerateURL: debugGenerateURL, validateTitle: validateTitle };
+	module.exports = { Color: Color, Painting: Painting, SKY_COLORS: SKY_COLORS, SKY_DAY: SKY_DAY, debugGenerateURL: debugGenerateURL, validateTitle: validateTitle };
 } catch (ex) {}

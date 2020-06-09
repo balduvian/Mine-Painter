@@ -15,11 +15,16 @@ let createGalleryItem = (item:GalleryItem) => {
 
 	/* give delete button functionality */
 	let thisData = item.data;
-	let thisDiv = <HTMLDivElement>gallery.lastElementChild;
+	let thisDiv = gallery.lastElementChild as HTMLDivElement;
 
 	(thisDiv.getElementsByClassName('deleteButton')[0] as HTMLElement).onclick = () => {
 		deleteGalleryItem(thisData, thisDiv);
 	};
+
+	/* set sky color */
+	let pictureHolder = thisDiv.getElementsByClassName('pictureHolder')[0] as HTMLDivElement;
+	let skyColor = fromBase66(thisData, 2);
+	pictureHolder.style.backgroundColor = SKY_COLORS[skyColor].toCSS();
 
 	/* center the image */
 	centerImage(thisDiv.getElementsByTagName('img')[0]);

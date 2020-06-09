@@ -294,7 +294,7 @@ let createPaintingImage = (painting:Painting) => {
 		let completed = 0;
 		let max = painting.width * painting.height;
 
-		jimp.create(16 * painting.width, 16 * painting.height, shared.SKY_COLOR.toHex()).then(image => {
+		jimp.create(16 * painting.width, 16 * painting.height, shared.SKY_COLORS[painting.sky].toHex()).then(image => {
 			for (let j = 0; j < painting.height; ++j) {
 				for (let i = 0; i < painting.width; ++i) {
 					let dataIndex = j * painting.width + i;

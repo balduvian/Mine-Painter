@@ -125,6 +125,21 @@ let setupButtons = () => {
 
 	let backButton = document.getElementById('backButton') as HTMLButtonElement;
 	backButton.onclick = closeInventory;
+
+	let skyButton = document.getElementById('skyButton') as HTMLButtonElement;
+	skyButton.onclick = cycleSky;
+}
+
+let cycleSky = () => {
+	let currentSky = painting.sky;
+	++currentSky;
+
+	if (currentSky === SKY_COLORS.length)
+		currentSky = 0;
+	
+	console.log(currentSky);
+
+	setSkyColor(currentSky);
 }
 
 let getGrid = () => {
@@ -209,7 +224,7 @@ let onClickSpace = (index:number, gridImg:HTMLImageElement, buttons:number) => {
 	
 		/* update in hash */
 		let hash = document.location.hash.substr(1);
-		document.location.hash = hash.slice(0, 2 + index) + toBase66(insertion) + hash.slice(3 + index);
+		document.location.hash = hash.slice(0, PAINTING_HEADER_SIZE + index) + toBase66(insertion) + hash.slice(PAINTING_HEADER_SIZE + 1 + index);
 
 	/* just selecting block */
 	} else if (middle) {
@@ -220,6 +235,20 @@ let onClickSpace = (index:number, gridImg:HTMLImageElement, buttons:number) => {
 	}
 }
 
+let setSkyColor = (sky:number) => {
+	let gridElement = getGrid();
+	gridElement.style.backgroundColor = SKY_COLORS[sky].toCSS();
+
+	console.log(SKY_COLORS[sky].toCSS());
+
+	/* edit the painting */
+	painting.sky = sky;
+
+	/* edit the hash */
+	let hash = document.location.hash.substr(1);
+	document.location.hash = hash.slice(0, 2) + toBase66(sky) + hash.slice(3);
+}
+
 let createGrid = (painting:Painting) => {
 	let gridElement = clearGrid();
 
@@ -228,6 +257,8 @@ let createGrid = (painting:Painting) => {
 
 	gridElement.style.setProperty('--paintingWidth', painting.width+'');
 	gridElement.style.setProperty('--paintingHeight', painting.height+'');
+
+	setSkyColor(painting.sky);
 
 	for (var i = 0; i < painting.width * painting.height; ++i) {
 		let gridSpace = document.createElement('div');
@@ -254,7 +285,6 @@ let createGrid = (painting:Painting) => {
 	}
 
 	gridElement.addEventListener('contextmenu', event => { 
-		// do something here... 
 		event.preventDefault();
 	}, false);
 }
@@ -324,7 +354,7 @@ let resize = (newWidth:number, newHeight:number, oldPainting:Painting, offsetX:n
 		}
 	}
 
-	painting = new Painting(newSheet, newWidth);
+	painting = new Painting(newSheet, newWidth, painting.sky);
 	createGrid(painting);
 	setHash(painting);
 }

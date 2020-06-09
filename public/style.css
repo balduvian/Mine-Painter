@@ -195,9 +195,6 @@ button:focus {
 	--paintingHeight: 8;
 
 	display: grid;
-	/* grid template will be set in the js */
-
-	background-color: var(--sky);
 
 	width: calc(var(--scale) * var(--paintingWidth));
 	height: calc(var(--scale) * var(--paintingHeight));
@@ -451,8 +448,6 @@ button:focus {
 
 .pictureHolder {
 	overflow: hidden;
-
-	background-color: var(--sky);
 }
 
 .pictureHolder > img {
