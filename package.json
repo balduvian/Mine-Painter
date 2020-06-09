@@ -1,0 +1,29 @@
+{
+  "name": "mine-painter",
+  "version": "1.0.0",
+  "description": "minecraft painting webapp",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-handlebars": "^4.0.4",
+    "jimp": "^0.12.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "test",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/osu-cs290-sp20/final-project-best-team.git"
+  },
+  "keywords": [
+    "mine"
+  ],
+  "author": "balduvian",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/osu-cs290-sp20/final-project-best-team/issues"
+  },
+  "homepage": "https://github.com/osu-cs290-sp20/final-project-best-team#readme"
+}
