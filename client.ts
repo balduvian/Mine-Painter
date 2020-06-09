@@ -216,6 +216,8 @@ let onClickSpace = (index:number, gridImg:HTMLImageElement, buttons:number) => {
 		/* create air if right click */
 		let insertion = left ? hotbar.getBlock() : BLOCK_ID_AIR;
 
+		console.log(insertion);
+
 		/* update in painting representation */
 		painting.data[index] = insertion;
 	
@@ -308,7 +310,7 @@ let fillInventory = (blockNames:string[]) => {
 
 		let index = i;
 
-		blockImg.onclick = () => {
+		blockImg.onmousedown = () => {
 			hotbar.addBlock(index);
 		}
 
@@ -344,9 +346,12 @@ let resize = (newWidth:number, newHeight:number, oldPainting:Painting, offsetX:n
 	let oldHeight = oldPainting.height;
 	let oldSheet = oldPainting.data;
 
+	let usingWidth = Math.min(oldWidth, newWidth);
+	let usingHeight = Math.min(oldHeight, newHeight);
+
 	/* copy transformed data into new sheet */
-	for (let i = 0; i < oldWidth; ++i) {
-		for (let j = 0; j < oldHeight; ++j) {
+	for (let i = 0; i < usingWidth; ++i) {
+		for (let j = 0; j < usingHeight; ++j) {
 			let oldPosition = j * oldWidth + i;
 			let newPosition = (j + offsetY) * newWidth + (i + offsetX);
 
@@ -355,6 +360,7 @@ let resize = (newWidth:number, newHeight:number, oldPainting:Painting, offsetX:n
 	}
 
 	painting = new Painting(newSheet, newWidth, painting.sky);
+
 	createGrid(painting);
 	setHash(painting);
 }
@@ -434,7 +440,7 @@ let createResize = (parent:HTMLDivElement) => {
 
 		if (err === '') {
 			/* find out how much offset we need to move the painting by */
-			let fullW = width - painting.height;
+			let fullW = width - painting.width;
 			let halfW = Math.floor(fullW / 2);
 			let fullH = height - painting.height;
 			let halfH = Math.floor(fullH / 2);
@@ -471,6 +477,9 @@ let createResize = (parent:HTMLDivElement) => {
 
 	let cancel = document.getElementById('cancelButton') as HTMLButtonElement;
 	cancel.onclick = closeOverlay;
+
+	/* enter the user into the width input */
+	return inputs[2];
 }
 
 let createSave = (parent:HTMLDivElement) => {
@@ -519,15 +528,20 @@ let createSave = (parent:HTMLDivElement) => {
 
 	let cancel = document.getElementById('cancelButton') as HTMLButtonElement;
 	cancel.onclick = closeOverlay;
+
+	let saveInput = document.getElementById('dialogBack').getElementsByTagName('input')[0];
+	return saveInput;
 }
 
-let openOverlay = (createDialog:(parent:HTMLDivElement) => void) => {
+let openOverlay = (createDialog:(parent:HTMLDivElement) => HTMLElement) => {
 	let overlay = getOverlay();
 
 	/* add the dialog box to the overlay */
-	createDialog(overlay);
+	let focus = createDialog(overlay);
 
 	overlay.classList.add('active');
+
+	focus.focus();
 }
 
 let closeOverlay = () => {

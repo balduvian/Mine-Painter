@@ -278,6 +278,9 @@ button:focus {
 	cursor: pointer;
 
 	margin-bottom: 10px;
+
+	user-select: none;
+	-webkit-user-drag: none;
 }
 
 #holder > img:hover {
@@ -348,7 +351,7 @@ button:focus {
 	position: absolute;
 
 	height: min-content;
-	width: 80px;
+	width: 90px;
 
 	/* center to the right of the screen */
 	right: 10px;
@@ -364,8 +367,8 @@ button:focus {
 }
 
 #hotbar > div {
-	width: 80px;
-	height: 70px;
+	width: 90px;
+	height: 80px;
 
 	user-select: none;
 	-webkit-user-drag: none;
@@ -384,8 +387,8 @@ button:focus {
 
 	position: absolute;
 
-	width: 70px;
-	height: 70px;
+	width: 80px;
+	height: 80px;
 
 	image-rendering: pixelated;
 
@@ -421,13 +424,16 @@ button:focus {
 #gallery {
 	--columns: 5;
 
-	width: calc(200px * var(--columns) + 10px * (var(--columns) - 1));
+	width: calc(200px * var(--columns) + 10px * (var(--columns) + 1));
 	height: fit-content;
 
 	margin-left: auto;
 	margin-right: auto;
 
 	margin-top: 10px;
+
+	padding-left: 10px;
+	padding-right: 10px;
 
 	display: grid;
 	grid-template-columns: repeat(var(--columns), 200px);

@@ -27,7 +27,8 @@ let createGalleryItem = (item:GalleryItem) => {
 	pictureHolder.style.backgroundColor = SKY_COLORS[skyColor].toCSS();
 
 	/* center the image */
-	centerImage(thisDiv.getElementsByTagName('img')[0]);
+	let img = thisDiv.getElementsByTagName('img')[0];
+	img.onload = () => centerImage(img);
 }
 
 let centerImage = (img:HTMLImageElement) => {
@@ -46,7 +47,7 @@ let deleteGalleryItem = (data:string, div:HTMLDivElement) => {
 
 let galleryResize = (width:number, gallery:HTMLDivElement) => {
 	let getColumns = (width:number) => {
-		let max = Math.floor((width + 10) / 210);
+		let max = Math.floor((width - 10) / 210);
 
 		if (max < 1)
 			max = 1; 

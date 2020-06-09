@@ -186,5 +186,77 @@
 	{
 		"name": "wheat",
 		"image": "wheat_stage7.png"
+	},
+	{
+		"name": "birch log",
+		"image": "birch_log.png"
+	},
+	{
+		"name": "bookshelf",
+		"image": "bookshelf.png"
+	},
+	{
+		"name": "brown mushroom",
+		"image": "brown_mushroom.png"
+	},
+	{
+		"name": "brown mushroom block",
+		"image": "brown_mushroom_block.png"
+	},
+	{
+		"name": "lily of the valley",
+		"image": "lily_of_the_valley.png"
+	},
+	{
+		"name": "magma",
+		"image": "magma.png"
+	},
+	{
+		"name": "mushroom stem",
+		"image": "mushroom_stem.png"
+	},
+	{
+		"name": "mycelium",
+		"image": "mycelium_side.png"
+	},
+	{
+		"name": "quartz ore",
+		"image": "nether_quartz_ore.png"
+	},
+	{
+		"name": "netherrack",
+		"image": "netherrack.png"
+	},
+	{
+		"name": "podzol",
+		"image": "podzol_side.png"
+	},
+	{
+		"name": "quartz block",
+		"image": "quartz_block_side.png"
+	},
+	{
+		"name": "red mushroom",
+		"image": "red_mushroom.png"
+	},
+	{
+		"name": "red mushroom block",
+		"image": "red_mushroom_block.png"
+	},
+	{
+		"name": "soul sand",
+		"image": "soul_sand.png"
+	},
+	{
+		"name": "spruce log",
+		"image": "spruce_log.png"
+	},
+	{
+		"name": "spruce leaves",
+		"image": "spruce_leaves.png"
+	},
+	{
+		"name": "birch leaves",
+		"image": "birch_leaves.png"
 	}
 ]

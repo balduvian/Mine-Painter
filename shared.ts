@@ -21,7 +21,8 @@ class Color {
 const SKY_COLORS = [
 	new Color(20, 215, 250),
 	new Color(250, 135, 11),
-	new Color(9, 9, 9)
+	new Color(9, 9, 9),
+	new Color(112, 17, 17)
 ];
 
 const SKY_DAY = 0;
@@ -52,12 +53,9 @@ let parseBase66 = (code:number) => {
 	/* magic ascii values */
 	/* too bad js doesn't have char literals */
 
-	if (code < 45)
-		return -1;
-
 	/* -. */
 	if (code < 47) 
-		return code - 42 + 62;
+		return code - 45 + 62;
 
 	/* numbers */
 	if (code < 58)
@@ -78,9 +76,6 @@ let parseBase66 = (code:number) => {
 	/* ~ */
 	if (code === 126)
 		return 65;
-
-	/* if it's an invalid base66 character */
-	return -1;
 }
 
 let debugGenerateURL = (width:number, height:number, numBlocks:number) => {
