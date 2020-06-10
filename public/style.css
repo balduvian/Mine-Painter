@@ -127,14 +127,27 @@ button:focus {
 #headerText {
 	color: var(--color5);
 
+	font-weight: bold;
+	font-style: italic;
+
     position: absolute;
-    left: 20px;
+    left: 90px;
 
     font-size: 60px;
 
     line-height: 100px;
 
     width: fit-content;
+}
+
+#logo {
+	position: absolute;
+
+	width: 60px;
+	height: 60px;
+
+	left: 20px;
+	top: 20px;
 }
 
 #buttonHolder {
@@ -762,7 +775,7 @@ p.dimensionRow {
 
 	padding: 10px;
 	padding-top: 30px;
-	
+
 	margin-left: auto;
 	margin-right: auto;
 }
@@ -783,7 +796,7 @@ p.dimensionRow {
 	height: fit-content;
 
 	color: var(--color5);
-	font-size: 25px;
+	font-size: 20px;
 
 	text-align: left;
 

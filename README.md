@@ -1,8 +1,12 @@
 # final-project-best-team
 
-## Mine Painter
+## IMPORTANT
 
-IMPORTANT you are going to need typescript to compile this webapp. Use `npm i -g typescript`
+You are going to need typescript to compile this webapp. Use `npm i -g typescript`
+
+The build script for this project only works with Windows. Open up the root directory and use `run` to start the server.
+
+## Mine Painter
 
 The perfect webapp for creating and sharing your very own 2D minecraft works of art. Select from over 60 blocks and paint them onto your canvas. Save them to a gallery for later. You can also just share the link because the information for the image is stored in the URL. You can also download an image version of your painting to store locally.
 
@@ -67,3 +71,5 @@ The perfect webapp for creating and sharing your very own 2D minecraft works of 
 > Renaming existing gallery items
 
 > Deleting gallery items
+
+> About page with help

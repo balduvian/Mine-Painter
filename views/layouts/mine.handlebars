@@ -3,30 +3,29 @@
     <head>
         <title>Mine Painter</title>
 
-		<link rel="icon" type="image/png" href="/icon.png">
+		<link rel="icon" type="image/png" href="/logo.svg">
 
 		<link rel="stylesheet" href="/font-awesome-4.7.0/css/font-awesome.min.css">
 		<link rel="stylesheet" href="/style.css">
     </head>
     <body>
 		<div id = "header">
-			<p id = "headerText">Mine Painter</p>
+			<img id = "logo" src = "/logo.svg">
+			<p id = "headerText">MINE PAINTER</p>
 
 			<div id = "buttonHolder">
+				<a href="/about/">
+					<button class = "headerButton {{aboutActive}}">About</button>
+				</a>
 				<a href="/gallery">
 					<button class = "headerButton {{galleryActive}}">Gallery</button>
 				</a>
 				<a href="/edit/">
 					<button class = "headerButton {{editActive}}">Edit</button>
 				</a>
-				<a href="/about/">
-					<button class = "headerButton {{aboutActive}}">About</button>
-				</a>
 			</div>
 		</div>
 
-		<div id = "belowHeader">
-			{{{ body }}}
-        </div>
+		<div id = "belowHeader">{{{ body }}}</div>
     </body>
 </html>

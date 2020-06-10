@@ -156,10 +156,10 @@ let setupButtons = () => {
 	/* setup key shortcuts */
 
 	window.onkeydown = (event:KeyboardEvent) => {
+		let code = event.keyCode;
+
 		/* make sure no dialog boxes are open */
 		if (!getOverlay().firstChild) {
-			let code = event.keyCode;
-
 			if (!hotbar.onKey(code)) {
 				switch (code) {
 					case 71: {
@@ -199,7 +199,16 @@ let setupButtons = () => {
 					} break;
 				}
 			}
+
+			return false;
+		} else {
+			/* keycode for ESCAPE */
+			if (code === 27) {
+				closeOverlay();
+			}
 		}
+
+		return true;
 	}
 }
 
@@ -511,48 +520,10 @@ let createResize = (parent:HTMLDivElement) => {
 	});
 	parent.insertAdjacentHTML('beforeend', dialogHTML);
 
-	/* edit functionality */
-
 	let dialog = document.getElementById('dialogBack');
 
-	let arrows = Array.from((dialog.getElementsByClassName('arrowGrid')[0] as HTMLDivElement).children) as HTMLButtonElement[];
-	arrows.forEach(button => {
-		let thisButton = button;
-
-		button.onclick = (event) => {
-			/* remove active from the rest */
-			arrows.forEach(loopButton => {
-				loopButton.classList.remove('active');
-			});
-
-			/* put active on this */
-			thisButton.classList.add('active');
-		}
-	})
-
-	let inputs = Array.from(dialog.getElementsByClassName('dimensionInput') as HTMLCollectionOf<HTMLInputElement>);
-	inputs.forEach(input => {
-		if (input.classList.contains('fakeInput')) {
-			input.disabled = true;
-
-		} else {
-			input.maxLength = 2;
-			input.min = MIN_DIMENSION + '';
-			input.max = MAX_DIMENSION + '';
-			input.type = 'number';
-
-			input.onblur = event => {
-				let value = +(event.target as HTMLInputElement).value;
-				if (value < MIN_DIMENSION)
-					input.value = MIN_DIMENSION + '';
-				else if (value > MAX_DIMENSION)
-					input.value = MAX_DIMENSION + '';
-			}
-		}
-	});
-
-	let ok = document.getElementById('okButton') as HTMLButtonElement;
-	ok.onclick = () => {
+	/* edit functionality */
+	let okAction = () => {
 		/* validate input */
 		let widthInput = document.getElementById('widthInput') as HTMLInputElement;
 		let heightInput = document.getElementById('heightInput') as HTMLInputElement;
@@ -614,6 +585,57 @@ let createResize = (parent:HTMLDivElement) => {
 		}
 	}
 
+	let arrows = Array.from((dialog.getElementsByClassName('arrowGrid')[0] as HTMLDivElement).children) as HTMLButtonElement[];
+	arrows.forEach(button => {
+		let thisButton = button;
+
+		button.onclick = (event) => {
+			/* remove active from the rest */
+			arrows.forEach(loopButton => {
+				loopButton.classList.remove('active');
+			});
+
+			/* put active on this */
+			thisButton.classList.add('active');
+		}
+	})
+
+	let inputs = Array.from(dialog.getElementsByClassName('dimensionInput') as HTMLCollectionOf<HTMLInputElement>);
+	inputs.forEach(input => {
+		if (input.classList.contains('fakeInput')) {
+			input.disabled = true;
+
+		} else {
+			input.maxLength = 2;
+			input.min = MIN_DIMENSION + '';
+			input.max = MAX_DIMENSION + '';
+			input.type = 'number';
+
+			input.onblur = event => {
+				let value = +(event.target as HTMLInputElement).value;
+				if (value < MIN_DIMENSION)
+					input.value = MIN_DIMENSION + '';
+				else if (value > MAX_DIMENSION)
+					input.value = MAX_DIMENSION + '';
+			}
+
+			input.onfocus = event => {
+				(event.target as HTMLInputElement).value = '';
+			}
+
+			input.onkeydown = event => {
+				let code = event.keyCode;
+
+				/* keycode for enter */
+				if (code === 13)
+					okAction();
+			}
+		}
+	});
+
+	let ok = document.getElementById('okButton') as HTMLButtonElement;
+	ok.onclick = okAction;
+
 	let cancel = document.getElementById('cancelButton') as HTMLButtonElement;
 	cancel.onclick = closeOverlay;
 
@@ -627,8 +649,7 @@ let createSave = (parent:HTMLDivElement) => {
 
 	/* edit functionality */
 
-	let ok = document.getElementById('okButton');
-	ok.onclick = () => {
+	let okAction = () => {
 		/* can't spam requests */
 		if (!ok.classList.contains('loading')) {
 			let fail = (reason:string) => {
@@ -665,10 +686,21 @@ let createSave = (parent:HTMLDivElement) => {
 		}
 	}
 
+	let ok = document.getElementById('okButton');
+	ok.onclick = okAction;
+
 	let cancel = document.getElementById('cancelButton') as HTMLButtonElement;
 	cancel.onclick = closeOverlay;
 
 	let saveInput = document.getElementById('dialogBack').getElementsByTagName('input')[0];
+	saveInput.onkeydown = event => {
+		let code = event.keyCode;
+
+		/* keycode for enter */
+		if (code === 13)
+			okAction();
+	}
+
 	return saveInput;
 }
 
