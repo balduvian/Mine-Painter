@@ -65,6 +65,16 @@ class Hotbar {
 
 		/* select first slot */
 		this.select(0);
+
+		/* add dynamic scaling */
+		let container = this.div.parentElement as HTMLDivElement;
+		window.onresize = () => {
+			if (container.clientHeight < (length * 80 + (length + 1) * 5) + 200) {
+				this.div.style.setProperty('--scale', '0.75');
+			} else {
+				this.div.style.setProperty('--scale', '1');
+			}
+		}
 	}
 
 	onKey(code:number) {
@@ -139,6 +149,9 @@ let setupButtons = () => {
 	let layerButton = document.getElementById('layerButton') as HTMLButtonElement;
 	layerButton.onclick = toggleLayer;
 
+	let copyButton = document.getElementById('copyButton') as HTMLButtonElement;
+	copyButton.onclick = copyUrl;
+
 	/* setup key shortcuts */
 
 	window.onkeydown = (event:KeyboardEvent) => {
@@ -183,6 +196,19 @@ let setupButtons = () => {
 			}
 		}
 	}
+}
+
+let copyUrl = () => {
+	/* use a big hack to copy text into clipboard */
+	let area = document.createElement('textarea');
+	document.body.appendChild(area);
+
+	area.innerHTML = window.location.href;
+
+	area.select();
+	document.execCommand('copy');
+
+	area.remove();
 }
 
 let toggleLayer = () => {
