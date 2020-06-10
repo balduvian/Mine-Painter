@@ -2,7 +2,7 @@
 
 ### Mine Painter
 
-The perfect webapp for creating and sharing your very own 2D minecraft works of art. Select from over 60 blocks (most not yet added) and paint them onto your canvas. Save them to a gallery for later (not yet added). You can also just share the link because the information for the image is stored in the URL. You can also download an image version of your painting to store locally.
+The perfect webapp for creating and sharing your very own 2D minecraft works of art. Select from over 60 blocks and paint them onto your canvas. Save them to a gallery for later. You can also just share the link because the information for the image is stored in the URL. You can also download an image version of your painting to store locally.
 
 #### Functionality and Shortcuts
 
@@ -14,15 +14,20 @@ The perfect webapp for creating and sharing your very own 2D minecraft works of 
 
 > middle click - select block
 
-#### not yet added
-
 > G - toggle grid
+
+> D - cycle through sky colors
+
+> L - switch active layer
 
 > S - save current painting
 
-> F2 - name current painting
+> P - download an image of the painting
 
-> V - download an image of the painting
+> E - open / close inventory
 
-> and probably many more...
+#### not yet added
 
+> ability to scroll and zoom in editor
+
+> ability to rename paintings in the gallery

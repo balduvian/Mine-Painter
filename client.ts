@@ -142,21 +142,43 @@ let setupButtons = () => {
 	/* setup key shortcuts */
 
 	window.onkeydown = (event:KeyboardEvent) => {
-		let code = event.keyCode;
+		/* make sure no dialog boxes are open */
+		if (!getOverlay().firstChild) {
+			let code = event.keyCode;
 
-		if (!hotbar.onKey(code)) {
-			switch (code) {
-				case 71: {
-					/* keycode for g */
-					toggleGrid();
-				} break;
-				case 68: {
-					/* keycode for d */
-					cycleSky();
-				} break;
-				case 76: {
-					/* keycode for l */
-					toggleLayer();
+			if (!hotbar.onKey(code)) {
+				switch (code) {
+					case 71: {
+						/* keycode for g */
+						toggleGrid();
+					} break;
+					case 68: {
+						/* keycode for d */
+						cycleSky();
+					} break;
+					case 76: {
+						/* keycode for l */
+						toggleLayer();
+					} break;
+					case 83: {
+						/* keycode for s */
+						openOverlay(createSave);
+					} break;
+					case 82: {
+						/* keycode for r */
+						openOverlay(createResize);
+					} break;
+					case 80: {
+						/* keycode for p */
+						getImage(painting);
+					} break;
+					case 69: {
+						/* keycode for e */
+						if (getInventory().classList.contains('active'))
+							closeInventory();
+						else
+							openInventory();
+					} break;
 				}
 			}
 		}
