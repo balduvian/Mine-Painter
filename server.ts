@@ -14,7 +14,8 @@ let server = express();
 
 let blockNames:Array<string> = [];
 let blockURLs:Array<string> = [];
-let blockImages:Array<Jimp> = [];
+let foregroundImages:Array<Jimp> = [];
+let backgroundImages:Array<Jimp> = [];
 
 let missingBuffer:Buffer;
 
@@ -59,9 +60,12 @@ let loadBlockData = () => {
 			});
 
 			/* make jimp images for all the blocks */
+			/* and all background blocks */
 			let imagesCreated = 0;
 			let maxImages = blockURLs.length;
-			blockImages = new Array(maxImages);
+
+			foregroundImages = new Array(maxImages);
+			backgroundImages = new Array(maxImages);
 
 			for (let i = 0; i < maxImages; ++i) {
 				let index = i;
@@ -69,7 +73,8 @@ let loadBlockData = () => {
 				let blockURL = 'blocks/' + blockURLs[index];
 
 				jimp.read(blockURL).then(image => {
-					blockImages[index] = image;
+					foregroundImages[index] = image;
+					backgroundImages[index] = image.clone().brightness(-0.5);
 
 					++imagesCreated;
 
@@ -291,27 +296,22 @@ loadBlockData().then(() => {
  */
 let createPaintingImage = (painting:Painting) => {
 	return new Promise((accept, reject) => {
-		let completed = 0;
-		let max = painting.width * painting.height;
-
 		jimp.create(16 * painting.width, 16 * painting.height, shared.SKY_COLORS[painting.sky].toHex()).then(image => {
 			for (let j = 0; j < painting.height; ++j) {
 				for (let i = 0; i < painting.width; ++i) {
 					let dataIndex = j * painting.width + i;
-					let blockIndex = painting.data[dataIndex];
-					let blockImage = blockImages[blockIndex];
+
+					let background = painting.background[dataIndex];
+					let foreground = painting.foreground[dataIndex];
 					
-					image.blit(blockImage, i * 16, j * 16, (err, blitImage) => {
-						++completed;
-
-						if (completed === max)
-							blitImage.getBufferAsync(jimp.MIME_PNG).then(buffer => {
-								accept(buffer);
-
-							}).catch(reject);
-					});
+					image.blit(backgroundImages[background], i * 16, j * 16).blit(foregroundImages[foreground], i * 16, j * 16);
 				}
 			}
+
+			image.getBufferAsync(jimp.MIME_PNG).then(buffer => {
+				accept(buffer);
+			}).catch(reject);
+
 		}).catch(reject);
 	});
 }

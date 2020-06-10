@@ -8,6 +8,7 @@
 
 	/* will be set in the js */
 	--sky: default;
+	--gridColor: default;
 }
 
 html, body, p, div, button, img, input {
@@ -186,7 +187,11 @@ button:focus {
 }
 
 #footer {
-    background-color: var(--color1);
+    background-color: var(--color2);
+}
+
+#gridContainer {
+	overflow: hidden;
 }
 
 #grid {
@@ -216,10 +221,21 @@ button:focus {
 }
 
 #grid img {
+	position: absolute;
+	left: 0;
+	top: 0;
+
+	width: var(--scale);
+	height: var(--scale);
+
 	image-rendering: pixelated;
 
 	user-select: none;
 	-webkit-user-drag: none;
+}
+
+#grid .back {
+	filter: brightness(50%);
 }
 
 #grid .gridlines {
@@ -227,7 +243,7 @@ button:focus {
 	top: 0;
 	left: 0;
 
-	border: 0.5px solid var(--color5);
+	border: 0.5px solid var(--gridColor);
 }
 
 /* inventory stuff */
@@ -241,7 +257,8 @@ button:focus {
 	width: 280px;
 
 	grid-template-columns: 1fr;
-	grid-template-rows: 1fr 100px;
+	grid-template-rows: 1fr 90px;
+	row-gap: 10px;
 
 	background-color: rgba(30, 30, 30, 0.75);
 }
@@ -254,7 +271,7 @@ button:focus {
 
 	display: grid;
 	grid-template-columns: 80px 80px 80px;
-	column-gap: 10px;
+	gap: 10px;
 }
 
 #holder::-webkit-scrollbar {
@@ -277,8 +294,6 @@ button:focus {
 
 	cursor: pointer;
 
-	margin-bottom: 10px;
-
 	user-select: none;
 	-webkit-user-drag: none;
 }
@@ -296,53 +311,75 @@ button:focus {
 }
 
 #backButton {
-	color: var(--color0);
+	color: var(--color1);
 	text-align: center;
 
 	border: none;
 
 	background: none;
+
+	width: calc(100% - 20px);
+	height: calc(100% - 10px);
+
+	margin-left: 10px;
+	margin-bottom: 10px;
 }
 
 #backButton:hover {
+	color: var(--color0);
 	background-color: var(--color3);
 }
 
 #backButton:active {
+	color: var(--color2);
 	background-color: var(--color5);
+}
+
+.editButton {
+	position: absolute;
+
+	width: 80px;
+	height: 80px;
+
+	bottom: 10px;
+
+	background-color: rgba(30, 30, 30, 0.75);
+
+	color: var(--color1);
+	border: none;
+}
+
+.editButton:hover {
+	background-color: rgba(60, 60, 60, 0.75);
+	color: var(--color0);
+}
+
+.editButton:active {
+	background-color: rgba(0, 0, 0, 0.75);
+	color: var(--color2);
 }
 
 #inventoryButton {
 	display: none;
 
-	position: absolute;
-
 	left: 10px;
-	bottom: 10px;
-
-	width: 80px;
-	height: 80px;
-
+	
 	text-align: center;
-
-	background-color: rgba(30, 30, 30, 0.75);
-	color: var(--color1);
-
-	border: none;
 }
 
 #inventoryButton.active {
 	display: block;
 }
 
-#inventoryButton.active:hover {
-	background-color: rgba(60, 60, 60, 0.75);
-	color: var(--color0);
+#layerButton {
+	right: 10px;
 }
 
-#inventoryButton.active:active {
-	background-color: rgba(0, 0, 0, 0.75);
-	color: var(--color2);
+#layerButton > img {
+	width: 40px;
+	height: 40px;
+
+	margin: 20px;
 }
 
 /* hotbar stuff */

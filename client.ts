@@ -5,7 +5,7 @@ var Handlebars;
 const GRID_ID = 'grid';
 const SPACE_CLASS = 'space';
 
-const HOTBAR_LENGTH = 6;
+const HOTBAR_LENGTH = 7;
 
 /* all the blocks the client knows about */
 let blockNames:string[];
@@ -14,6 +14,9 @@ let blockNames:string[];
 let painting:Painting;
 
 let hotbar:Hotbar;
+
+let showingGrid:boolean;
+let activeLayer:boolean;
 
 interface Block {
 	name: string,
@@ -60,20 +63,21 @@ class Hotbar {
 			}
 		}
 
-		window.onkeydown = (event:KeyboardEvent) => {
-			let code = event.keyCode;
+		/* select first slot */
+		this.select(0);
+	}
 
-			/* number keys */
-			if (code >= 49 && code <= 57) {
-				let keySelection = code - 49;
+	onKey(code:number) {
+		if (code >= 49 && code <= 57) {
+			let keySelection = code - 49;
 
-				if (keySelection < this.blocks.length)
-					this.select(keySelection);
+			if (keySelection < this.blocks.length) {
+				hotbar.select(keySelection);
+				return true;
 			}
 		}
 
-		/* select first slot */
-		this.select(0);
+		return false;
 	}
 
 	private select(index:number) {
@@ -128,6 +132,60 @@ let setupButtons = () => {
 
 	let skyButton = document.getElementById('skyButton') as HTMLButtonElement;
 	skyButton.onclick = cycleSky;
+
+	let gridButton = document.getElementById('gridButton') as HTMLButtonElement;
+	gridButton.onclick = toggleGrid;
+
+	let layerButton = document.getElementById('layerButton') as HTMLButtonElement;
+	layerButton.onclick = toggleLayer;
+
+	/* setup key shortcuts */
+
+	window.onkeydown = (event:KeyboardEvent) => {
+		let code = event.keyCode;
+
+		if (!hotbar.onKey(code)) {
+			switch (code) {
+				case 71: {
+					/* keycode for g */
+					toggleGrid();
+				} break;
+				case 68: {
+					/* keycode for d */
+					cycleSky();
+				} break;
+				case 76: {
+					/* keycode for l */
+					toggleLayer();
+				}
+			}
+		}
+	}
+}
+
+let toggleLayer = () => {
+	activeLayer = !activeLayer;
+
+	setLayer(activeLayer);
+}
+
+let setLayer = (layer:boolean) => {
+	activeLayer = layer;
+
+	/* set icon of layer button */
+	let layerButton = document.getElementById('layerButton') as HTMLButtonElement;
+	(layerButton.firstChild as HTMLImageElement).src = layer ? '/svg/icon_front.svg' : '/svg/icon_back.svg';
+}
+
+let toggleGrid = () => {
+	showingGrid = !showingGrid;
+
+	showGrid(showingGrid);
+}
+
+let showGrid = (show:boolean) => {
+	showingGrid = show;
+	document.documentElement.style.setProperty('--gridColor', show ? 'var(--color5)' : 'rgba(0,0,0,0)');
 }
 
 let cycleSky = () => {
@@ -137,8 +195,6 @@ let cycleSky = () => {
 	if (currentSky === SKY_COLORS.length)
 		currentSky = 0;
 	
-	console.log(currentSky);
-
 	setSkyColor(currentSky);
 }
 
@@ -188,8 +244,10 @@ let updateGrid = (painting:Painting) => {
 	let childList = gridElement.children;
 
 	for (var i = 0; i < painting.width * painting.height; ++i) {
-		let gridImg = <HTMLImageElement>childList[i].firstChild;
-		gridImg.src = getBlockURL(painting.data[i]);
+		let spaceChildList = childList[i].children;
+
+		(spaceChildList[0] as HTMLImageElement).src = getBlockURL(painting.background[i]);
+		(spaceChildList[1] as HTMLImageElement).src = getBlockURL(painting.foreground[i]);
 	}
 }
 
@@ -207,33 +265,53 @@ let middleDown = (buttons:number) => {
 	return (buttons & 0b100) === 0b100;
 }
 
-let onClickSpace = (index:number, gridImg:HTMLImageElement, buttons:number) => {
+let onClickSpace = (index:number, foregroundImg:HTMLImageElement, backgroundImg:HTMLImageElement, buttons:number) => {
 	let left = leftDown(buttons);
 	let right = rightDown(buttons);
 	let middle = middleDown(buttons);
 
-	if (left || right) {
-		/* create air if right click */
-		let insertion = left ? hotbar.getBlock() : BLOCK_ID_AIR;
+	let placeForeground = (insertion:number) => {
+		painting.foreground[index] = insertion;
+				
+		foregroundImg.src = getBlockURL(insertion);
 
-		console.log(insertion);
-
-		/* update in painting representation */
-		painting.data[index] = insertion;
-	
-		/* update in dom */
-		gridImg.src = getBlockURL(insertion);
-	
-		/* update in hash */
 		let hash = document.location.hash.substr(1);
 		document.location.hash = hash.slice(0, PAINTING_HEADER_SIZE + index) + toBase66(insertion) + hash.slice(PAINTING_HEADER_SIZE + 1 + index);
+	}
+
+	let placeBackground = (insertion:number) => {
+		painting.background[index] = insertion;
+							
+		backgroundImg.src = getBlockURL(insertion);
+
+		let hash = document.location.hash.substr(1);
+		let offset = PAINTING_HEADER_SIZE + painting.width * painting.height;
+		document.location.hash = hash.slice(0, offset + index) + toBase66(insertion) + hash.slice(offset + 1 + index);
+	}
+
+	if (left) {
+		activeLayer ? placeForeground(hotbar.getBlock()) : placeBackground(hotbar.getBlock());
+
+	} else if (right) {
+		/* clear both foreground and background */
+		placeBackground(BLOCK_ID_AIR);
+		placeForeground(BLOCK_ID_AIR);
 
 	/* just selecting block */
 	} else if (middle) {
-		let block = painting.data[index];
+		let foregroundBlock = painting.foreground[index];
 
-		if (block != BLOCK_ID_AIR)
-			hotbar.addBlock(block);
+		/* add the first block in this spot that isn't air */
+
+		if (foregroundBlock === BLOCK_ID_AIR) {
+			let backgroundBlock = painting.background[index];
+
+			if (backgroundBlock !== BLOCK_ID_AIR)
+				hotbar.addBlock(backgroundBlock);
+
+		} else {
+			hotbar.addBlock(foregroundBlock);
+		}
 	}
 }
 
@@ -267,9 +345,14 @@ let createGrid = (painting:Painting) => {
 		gridSpace.className = 'space';
 		gridElement.appendChild(gridSpace);
 		
-		let gridImg = document.createElement('img');
-		gridImg.src = '/blocks/' + blockNames[painting.data[i]];
-		gridSpace.appendChild(gridImg);
+		let backgroundImg = document.createElement('img');
+		backgroundImg.className = 'back';
+		backgroundImg.src = getBlockURL(painting.background[i]);
+		gridSpace.appendChild(backgroundImg);
+
+		let foregroundImg = document.createElement('img');
+		foregroundImg.src = getBlockURL(painting.foreground[i]);
+		gridSpace.appendChild(foregroundImg);
 
 		let gridLines = document.createElement('div');
 		gridLines.className = 'gridlines';
@@ -278,11 +361,11 @@ let createGrid = (painting:Painting) => {
 		let index = i;
 
 		gridSpace.onmousedown = (event:MouseEvent) => {
-			onClickSpace(index, gridImg, event.buttons);
+			onClickSpace(index, foregroundImg, backgroundImg, event.buttons);
 		}
 
 		gridSpace.onmouseover = (event:MouseEvent) => {
-			onClickSpace(index, gridImg, event.buttons);
+			onClickSpace(index, foregroundImg, backgroundImg, event.buttons);
 		}
 	}
 
@@ -340,11 +423,13 @@ let getOverlay = () => {
 
 let resize = (newWidth:number, newHeight:number, oldPainting:Painting, offsetX:number, offsetY:number) => {
 	/* fill a new sheet with air */
-	let newSheet = new Array(newWidth * newHeight).fill(BLOCK_ID_AIR);
+	let newForeground = new Array(newWidth * newHeight).fill(BLOCK_ID_AIR);
+	let newBackground = new Array(newWidth * newHeight).fill(BLOCK_ID_AIR);
 
 	let oldWidth = oldPainting.width;
 	let oldHeight = oldPainting.height;
-	let oldSheet = oldPainting.data;
+	let oldForeground = oldPainting.foreground;
+	let oldBackground = oldPainting.background;
 
 	let usingWidth = Math.min(oldWidth, newWidth);
 	let usingHeight = Math.min(oldHeight, newHeight);
@@ -355,11 +440,12 @@ let resize = (newWidth:number, newHeight:number, oldPainting:Painting, offsetX:n
 			let oldPosition = j * oldWidth + i;
 			let newPosition = (j + offsetY) * newWidth + (i + offsetX);
 
-			newSheet[newPosition] = oldSheet[oldPosition];
+			newForeground[newPosition] = oldForeground[oldPosition];
+			newBackground[newPosition] = oldBackground[oldPosition];
 		}
 	}
 
-	painting = new Painting(newSheet, newWidth, painting.sky);
+	painting = new Painting(newForeground, newBackground, newWidth, painting.sky);
 
 	createGrid(painting);
 	setHash(painting);
@@ -581,6 +667,9 @@ let onStartEdit = (hash:string) => {
 
 	/* create the painting from the url */
 	painting = parseData(hash);
+
+	showGrid(true);
+	setLayer(LAYER_FOREGROUND);
 
 	request.onreadystatechange = () => {
 		if (request.readyState === 4) {

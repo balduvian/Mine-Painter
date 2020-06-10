@@ -40,6 +40,9 @@ const MIN_DIMENSION = 4;
 const MIN_TITLE_LENGTH = 2;
 const MAX_TITLE_LENGTH = 32;
 
+const LAYER_BACKGROUND = false;
+const LAYER_FOREGROUND = true;
+
 let toBase66 = (int:number) => {
 	return BASE_66.charAt(int);
 }
@@ -95,14 +98,15 @@ class Painting {
 	height: number;
 	sky: number;
 
-	data: number[];
+	foreground: number[];
+	background: number[];
 
 	err: boolean;
 
-	constructor(data?:string | number[], width?:number, sky?:number) {
+	constructor(data?:string | number[], data2?: number[], width?:number, sky?:number) {
 		if (data) {
 			if (Array.isArray(data))
-				this.setArray(data, width, sky);
+				this.setArray(data, data2, width, sky);
 			else
 				this.setData(data);
 
@@ -119,7 +123,11 @@ class Painting {
 		data += toBase66(this.height);
 		data += toBase66(this.sky);
 
-		this.data.forEach(blockID => {
+		this.foreground.forEach(blockID => {
+			data += toBase66(blockID);
+		});
+
+		this.background.forEach(blockID => {
 			data += toBase66(blockID);
 		});
 
@@ -153,28 +161,38 @@ class Painting {
 			return this.setDefault();
 		}
 
-		let goodLength = this.width * this.height + PAINTING_HEADER_SIZE;
+		let numBlocks = this.width * this.height;
+		let goodLength = numBlocks * 2 + PAINTING_HEADER_SIZE;
+
 		/* is the amount of information correct for this width and height */
 		if (data.length !== goodLength) {
 			this.err = true;
 			return this.setDefault();
 		}
 
-		this.data = [];
-		for (let i = 0; i < this.width * this.height; ++i)
-			this.data.push(fromBase66(data, i + PAINTING_HEADER_SIZE));
+		this.foreground = new Array(numBlocks);
+		this.background = new Array(numBlocks);
+
+		/* fill in blocks */
+		for (let i = 0; i < numBlocks; ++i)
+			this.foreground[i] = fromBase66(data, i + PAINTING_HEADER_SIZE);
+
+		for (let i = 0; i < numBlocks; ++i)
+			this.background[i] = fromBase66(data, i + PAINTING_HEADER_SIZE + numBlocks);
 
 		/* if we made it this far we are free of errors */
 		this.err = false;
 	}
 
-	setArray(array:number[], width:number, sky:number) {
-		this.data = array;
+	setArray(foreground:number[], background:number[], width:number, sky:number) {
+		this.foreground = foreground;
+		this.background = background;
+
 		this.err = false;
 		this.sky = sky;
 
 		this.width = width;
-		this.height = Math.floor(array.length / width);
+		this.height = Math.floor(foreground.length / width);
 	}
 
 	/**
@@ -187,7 +205,8 @@ class Painting {
 		this.height = DEF_DIMENSION;
 		this.sky = SKY_DAY;
 
-		this.data = new Array(DEF_DIMENSION * DEF_DIMENSION).fill(BLOCK_ID_AIR);
+		this.foreground = new Array(DEF_DIMENSION * DEF_DIMENSION).fill(BLOCK_ID_AIR);
+		this.background = new Array(DEF_DIMENSION * DEF_DIMENSION).fill(BLOCK_ID_AIR);
 	}
 
 	/**
@@ -246,5 +265,5 @@ let request = (url:string) => {
 }
 
 try {
-	module.exports = { Color: Color, Painting: Painting, SKY_COLORS: SKY_COLORS, SKY_DAY: SKY_DAY, debugGenerateURL: debugGenerateURL, validateTitle: validateTitle };
+	module.exports = { Color: Color, Painting: Painting, SKY_COLORS: SKY_COLORS, SKY_DAY: SKY_DAY, debugGenerateURL: debugGenerateURL, validateTitle: validateTitle, LAYER_FOREGROUND: LAYER_FOREGROUND };
 } catch (ex) {}
