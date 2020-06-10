@@ -13,22 +13,56 @@ let createGalleryItem = (item:GalleryItem) => {
 
 	gallery.insertAdjacentHTML('beforeend', galleryHTML);
 
-	/* give delete button functionality */
 	let thisData = item.data;
 	let thisDiv = gallery.lastElementChild as HTMLDivElement;
 
-	(thisDiv.getElementsByClassName('deleteButton')[0] as HTMLElement).onclick = () => {
-		deleteGalleryItem(thisData, thisDiv);
-	};
+	/* center the image */
+	let img = thisDiv.getElementsByTagName('img')[0];
+	img.onload = () => centerImage(img);
 
 	/* set sky color */
 	let pictureHolder = thisDiv.getElementsByClassName('pictureHolder')[0] as HTMLDivElement;
 	let skyColor = fromBase66(thisData, 2);
 	pictureHolder.style.backgroundColor = SKY_COLORS[skyColor].toCSS();
 
-	/* center the image */
-	let img = thisDiv.getElementsByTagName('img')[0];
-	img.onload = () => centerImage(img);
+	/* give delete button functionality */
+	(thisDiv.getElementsByClassName('deleteButton')[0] as HTMLButtonElement).onclick = () => {
+		deleteGalleryItem(thisData, thisDiv);
+	};
+
+	/* add input functionality */
+	let title = thisDiv.getElementsByClassName('itemName')[0] as HTMLParagraphElement;
+	let nameInput = thisDiv.getElementsByTagName('input')[0];
+
+	title.onclick = () => {
+		nameInput.classList.add('active');
+		nameInput.value = title.textContent;
+		nameInput.disabled = false;
+		nameInput.focus();
+
+		title.classList.remove('active');
+	};
+
+	let closeInput = () => {
+		nameInput.classList.remove('active');
+		title.classList.add('active');
+	}
+
+	let submitName = (name:string) => {
+		nameInput.disabled = true;
+		nameInput.blur();
+
+		request('/renameGallery/' + thisData + '/' + name).then(response => {
+			title.textContent = name;
+			closeInput();
+		}).catch(() => {
+			closeInput();
+		});
+	}
+
+	/* when you leave the input or press enter */
+	nameInput.onblur = () => submitName(nameInput.value);
+	nameInput.onkeydown = (event) => {if (event.keyCode === 13) submitName(nameInput.value);};
 }
 
 let centerImage = (img:HTMLImageElement) => {

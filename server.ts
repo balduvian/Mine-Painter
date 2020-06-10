@@ -130,6 +130,22 @@ let saveGalleryData = () => {
 	fs.writeFileSync(path, data);
 }
 
+let getGalleryItem = (data:string):[GalleryItem, number] => {
+	let index = -1;
+
+	/* search for the data in our gallery list */
+	gallery.every((item, i) => {
+		if (item.data === data) {
+			index = i;
+			return false;
+		}
+
+		return true;
+	});
+
+	return [(index === -1) ? null : gallery[index], index];
+}
+
 server.use(express.static('public'));
 server.engine('handlebars', handlebars({defaultLayout: 'mine'}));
 server.set('view engine', 'handlebars');
@@ -211,20 +227,10 @@ server.get('/galleryItem/:id', (req, res, next) => {
 server.get('/deleteGalleryItem/:data', (req, res, next) => {
 	let data = req.params['data'];
 
-	let index = -1;
-
-	/* search for the data in our gallery list */
-	let found = gallery.every((item, i) => {
-		if (item.data === data) {
-			index = i;
-			return false;
-		}
-
-		return true;
-	});
+	let [item, index] = getGalleryItem(data);
 
 	if (index === -1) {
-		res.status(400).send('could not delete');
+		res.status(400).send('gallery item does not exist');
 
 	} else {
 		gallery.splice(index, 1);
@@ -249,6 +255,29 @@ server.get('/uploadGallery/:data/:title', (req, res, next) => {
 			gallery.push({data:data, title:title});
 			res.send('success');
 		}
+	} else {
+		res.status(400).send(titleResponse);
+	}		
+});
+
+server.get('/renameGallery/:data/:title', (req, res, next) => {
+	let data = req.params['data'];
+	let title = req.params['title'];
+
+	/* validate title */
+	let titleResponse = shared.validateTitle(title);
+
+	if (titleResponse === '') {
+		let [item, index] = getGalleryItem(data);
+
+		if (index === -1) {
+			res.status(400).send('gallery item does not exist');
+		} else {
+			/* actually rename the gallery item */
+			item.title = title;
+			res.send('renamed successfully');
+		}
+
 	} else {
 		res.status(400).send(titleResponse);
 	}		
