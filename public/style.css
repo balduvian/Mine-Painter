@@ -751,3 +751,135 @@ p.dimensionRow {
 	line-height: 50px;
 	font-size: 25px;
 }
+
+/* about */
+
+#about {
+	width: 1060px;
+
+	min-width: 520px;
+	max-width: 100%;
+
+	padding: 10px;
+	padding-top: 30px;
+	
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.aboutTitle {
+	height: 50px;
+	line-height: 50px;
+
+	color: var(--color5);
+	font-size: 50px;
+
+	text-align: left;
+
+	margin-bottom: 10px;
+}
+
+.aboutParagraph {
+	height: fit-content;
+
+	color: var(--color5);
+	font-size: 25px;
+
+	text-align: left;
+
+	margin-bottom: 30px;
+}
+
+#buttonGrid {
+	display: grid;
+	height: fit-content;
+
+	grid-template-columns: 1fr 1fr;
+
+	gap: 10px;
+
+	margin-bottom: 10px;
+}
+
+.buttonBox {
+	display: grid;
+
+	gap: 10px;
+	padding: 10px;
+
+	background-color: var(--color1);
+
+	grid-template-columns: 120px 1fr;
+	grid-template-rows: 1fr;
+
+	height: 140px;
+
+	overflow: hidden;
+
+	color: var(--color5);
+}
+
+.rightSide {
+	display: grid;
+
+	gap: 10px;
+	grid-template-columns: 1fr;
+	grid-template-rows: 30px 80px;
+}
+
+.fakeButton {
+	width: 120px;
+	height: 120px;
+
+	background-color: var(--color3);
+	color: var(--color0);
+
+	text-align: center;
+	line-height: 130px;
+
+	border: 5px solid var(--color5);
+}
+
+.buttonBoxTitle {
+	line-height: 30px;
+	font-size: 30px;
+	text-align: center;
+}
+
+.buttonBoxShortcut {
+	line-height: 30px;
+	font-size: 30px;
+	text-align: left;
+}
+
+.buttonParagraph {
+	font-size: 16px;
+	text-align: left;
+}
+
+#creditsHolder {
+	height: 100px;
+
+	margin-top: 70px;
+	margin-bottom: 10px;
+}
+
+#balduvian {
+	display: inline-block;
+
+	width: 100px;
+	height: 100px;
+}
+
+#creditsText {
+	display: inline-block;
+
+	height: 25px;
+	width: fit-content;
+
+	margin-left: 10px;
+
+	line-height: 25px;
+	color: var(--color5);
+	text-align: left;
+}

@@ -3,6 +3,9 @@ call node node_modules/handlebars/bin/handlebars views/partials/galleryItem.hand
 call node node_modules/handlebars/bin/handlebars views/partials/resizeDialog.handlebars -f public/resizeDialog.js
 call node node_modules/handlebars/bin/handlebars views/partials/saveDialog.handlebars -f public/saveDialog.js
 
+call node node_modules/handlebars/bin/handlebars views/partials/aboutParagraph.handlebars -f public/aboutParagraph.js
+call node node_modules/handlebars/bin/handlebars views/partials/buttonBox.handlebars -f public/buttonBox.js
+
 ::compile server
 call tsc server.ts
 

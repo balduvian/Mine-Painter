@@ -65,15 +65,16 @@ class Hotbar {
 
 		/* select first slot */
 		this.select(0);
+	}
 
-		/* add dynamic scaling */
+	resize() {
 		let container = this.div.parentElement as HTMLDivElement;
-		window.onresize = () => {
-			if (container.clientHeight < (length * 80 + (length + 1) * 5) + 200) {
-				this.div.style.setProperty('--scale', '0.75');
-			} else {
-				this.div.style.setProperty('--scale', '1');
-			}
+		let length = this.blocks.length;
+
+		if (container.clientHeight < (length * 80 + (length + 1) * 5) + 200) {
+			this.div.style.setProperty('--scale', '0.75');
+		} else {
+			this.div.style.setProperty('--scale', '1');
 		}
 	}
 
@@ -191,6 +192,10 @@ let setupButtons = () => {
 							closeInventory();
 						else
 							openInventory();
+					} break;
+					case 67: {
+						/* keycode for c */
+						copyUrl();
 					} break;
 				}
 			}
@@ -689,6 +694,10 @@ let closeOverlay = () => {
 	overlay.classList.remove('active');
 }
 
+let resizeScreen = () => {
+	hotbar.resize();
+}
+
 let getImage = (painting: Painting) => {
 	window.open('/image/' + painting.toData(), '_blank');
 }
@@ -731,6 +740,9 @@ let onStartEdit = (hash:string) => {
 			/* wait for blocks to load to start creating the painting in the DOM */
 			createGrid(painting);
 			setHash(painting);
+
+			window.onresize = resizeScreen;
+			resizeScreen();
 
 			/* when you manually update the url it is reflected in the document */
 			//window.onhashchange = (ev) => {

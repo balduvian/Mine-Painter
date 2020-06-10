@@ -21,17 +21,18 @@ let missingBuffer:Buffer;
 
 let gallery:GalleryItem[];
 
-let activeButtons = (gallery:boolean, edit:boolean) => {
+let activeButtons = (gallery:boolean, edit:boolean, about:boolean) => {
 	const CURRENT_TAG = 'current';
 
 	return {
 		galleryActive: gallery ? CURRENT_TAG : '',
-		editActive: edit ? CURRENT_TAG : ''
+		editActive: edit ? CURRENT_TAG : '',
+		aboutActive: about ? CURRENT_TAG : ''
 	};
 }
 
 let getEdit = (req, res, next) => {
-	res.render('partials/edit.handlebars', activeButtons(false, true));
+	res.render('partials/edit.handlebars', activeButtons(false, true, false));
 }
 
 let loadBlockData = () => {
@@ -203,7 +204,7 @@ server.get('/image/:data', (req, res, next) => {
 /* gallery stuff */
 
 server.get('/gallery', (req, res, next) => {
-	res.render('partials/gallery', activeButtons(true, false));
+	res.render('partials/gallery', activeButtons(true, false, false));
 });
 
 server.get('/galleryList', (req, res, next) => {
@@ -283,10 +284,14 @@ server.get('/renameGallery/:data/:title', (req, res, next) => {
 	}		
 });
 
+server.get('/about', (req, res, next) => {
+	res.render('partials/about', activeButtons(false, false, true));
+});
+
 server.get('*', (req, res, next) => {
 	console.log('URL:' + req.url);
 
-	res.render('partials/404', activeButtons(false, false));
+	res.render('partials/404', activeButtons(false, false, false));
 });
 
 /* startup */

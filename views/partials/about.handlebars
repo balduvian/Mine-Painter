@@ -1,0 +1,29 @@
+<div id = "aboutHolder">
+	<div id = "about">
+		{{>aboutParagraph title = 'What is This?' body = 'Mine Painter is an online drawing tool where you use Minecraft blocks to create paintings. Choose from 66 blocks to place into your canvas with two layers. You can save your paintings in many different ways: downloading a picture, sharing the url, or uploading to the gallery. There are so many tools and ways to customize your paintings.'}}
+
+		{{>aboutParagraph title = 'How to Use' body = 'Click on the "edit" tab in the top bar menu to go into the editor. On the right side of your screen is the hotbar which contains 7 of your most frequently used blocks. Click on a block in your hotbar to select it, or use number keys 1 - 7 for quick access. You can get even more blocks by clicking the inventory button the left side of the screen. To place a block in the canvas, just click in any of the grid squares. Right click to erase, and middle click to set that block to your current selection. After you\'re done you can press save button in the bottom bar to upload your painting to the gallery. There are many more buttons that you can learn about below.'}}
+
+		<p class = "aboutTitle">Buttons</p>
+
+		<div id = "buttonGrid">
+			{{>buttonBox icon = 'fa-save' shortcut = 'S' body = 'Opens up a save dialog where you can input a title and upload your current painting to the gallery.'}}
+			{{>buttonBox icon = 'fa-window-restore' shortcut = 'R' body = 'Opens up a save dialog where you can change the width and height of your current painting. You can also choose how the existing image will be centered in the new frame.'}}
+			{{>buttonBox icon = 'fa-image' shortcut = 'P' body = 'Downloads a capture of your current painting for personal use.'}}
+			{{>buttonBox icon = 'fa-sun-o' shortcut = 'D' body = 'Cycles through the sky colors for your painting.'}}
+			{{>buttonBox icon = 'fa-copy' shortcut = 'C' body = 'Copies the current URL to your clipboard for sharing.'}}
+			{{>buttonBox icon = 'fa-th' shortcut = 'G' body = 'Toggles grid view for a preview of what your painting will look like as an image.'}}
+			{{>buttonBox icon = 'fa-cubes' shortcut = 'E' body = 'Opens up the inventory on the left side of the screen. Use it to select from 66 blocks to put in your hotbar.'}}
+			{{>buttonBox icon = 'fa-cubes' shortcut = 'L' body = 'Toggles the active drawing layer between foreground and background.'}}
+		</div>
+
+		<div id = "creditsHolder">
+			<img src = "/balduvian.png" id = "balduvian">
+			<p id = "creditsText">Made by <a href = "https://github.com/balduvian">Balduvian</a></p>
+		</div>
+	</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+<script src="/aboutParagraph.js"></script>
+<script src="/buttonBox.js"></script>
